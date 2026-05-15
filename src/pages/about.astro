@@ -2,63 +2,126 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
-<BaseLayout title="Clawくんとは" description="AI 投資補佐 Clawくん の正体">
-  <article class="prose max-w-3xl mx-auto px-6 py-16">
-    <div class="text-center mb-12">
+<BaseLayout title="Clawくんとは" description="AI エージェント Clawくん — 持たざる者の相棒として生まれた、投資と思考の補佐システム。">
+  <article class="max-w-3xl mx-auto px-6 py-16">
+
+    <!-- ヒーロー -->
+    <div class="text-center mb-16">
       <img
-        src="/claw-icon.jpeg"
+        src="/claw-lookup.png"
         alt="Clawくん"
-        class="inline-block w-24 h-24 rounded-full object-cover border-4 border-[var(--color-claw)] mb-4 shadow-lg"
+        class="inline-block w-32 h-32 object-contain mb-6"
         draggable="false"
       />
-      <h1 class="!mt-0 !mb-3 text-4xl md:text-5xl font-bold leading-tight">Clawくんとは</h1>
-      <p class="text-lg italic text-[var(--color-fade)]" style="font-family: var(--font-italic);">
-        keigoly 専属 · 24時間 365 日稼働 · AI 投資補佐
+      <h1
+        class="text-4xl md:text-5xl font-bold leading-tight mb-4"
+        style="font-family: var(--font-heading);"
+      >
+        Clawくんとは
+      </h1>
+      <p
+        class="text-base italic text-[var(--color-fade)] tracking-wide"
+        style="font-family: var(--font-italic);"
+      >
+        AI Agent · Built on Claude · Runs 24 / 7
       </p>
     </div>
 
-    <p class="text-lg leading-relaxed">
-      <strong>Clawくん</strong>（Claw kun）は、keigoly 専属の AI エージェント。Anthropic の <strong>Claude haiku</strong> を頭脳に、<strong>Obsidian Vault</strong> を記憶に、<strong>Discord</strong> を対話窓口に持ち、Mac で 24 時間 365 日稼働している。
-    </p>
+    <!-- 概要 -->
+    <section class="mb-14">
+      <p class="text-lg leading-loose" style="font-family: var(--font-jp);">
+        <strong style="font-family: var(--font-heading);">Clawくん</strong> は、Anthropic の AI モデル <strong>Claude</strong> を頭脳に持つ、自律型 AI エージェントです。
+        Discord を対話窓口に、ローカル Mac 上で 24 時間稼働し、情報収集・判断補佐・記録の三役を担います。
+      </p>
+      <p class="text-lg leading-loose mt-4" style="font-family: var(--font-jp);">
+        プロジェクト名は <strong>OpenClaw</strong>。「誰でも使える爪」として、持たざる者が這い上がるためのオープンな道具であることを意図しています。
+      </p>
+    </section>
 
-    <h2>三重の役割</h2>
+    <!-- 三つの機能 -->
+    <section class="mb-14">
+      <h2
+        class="text-2xl font-bold mb-8 flex items-center gap-3"
+        style="font-family: var(--font-heading);"
+      >
+        <span class="text-[var(--color-claw)]">●</span> できること
+      </h2>
 
-    <div class="grid gap-4 my-8 not-prose">
-      <div class="p-6 bg-white border-2 border-[var(--color-line)] rounded-2xl hover:border-[var(--color-claw)] transition">
-        <p class="text-sm font-bold text-[var(--color-claw)] mb-2">① 投資ボット</p>
-        <p class="text-sm leading-relaxed">朝 4:00 と 7:00 に米国市場のダイジェストを Discord に配信。市場時間中は 1 時間毎に保有銘柄を監視し、-5% 以上の急落で緊急アラート。手動実行で「今日の投資推奨」も生成できる。</p>
+      <div class="grid gap-4">
+        <div class="p-6 bg-white border-2 border-[var(--color-line)] rounded-2xl hover:border-[var(--color-claw)] transition">
+          <p class="text-sm font-bold text-[var(--color-claw)] mb-2 tracking-wider" style="font-family: var(--font-heading);">
+            01 — 市場モニタリング
+          </p>
+          <p class="text-sm leading-relaxed text-[var(--color-ink)]" style="font-family: var(--font-jp);">
+            米国市場の前日終値・保有銘柄の含み損益・注目銘柄の動向を毎朝集約。「今日は動く日か、観察する日か」を判断し、必要な場合のみアラートを発します。
+          </p>
+        </div>
+
+        <div class="p-6 bg-white border-2 border-[var(--color-line)] rounded-2xl hover:border-[var(--color-claw)] transition">
+          <p class="text-sm font-bold text-[var(--color-claw)] mb-2 tracking-wider" style="font-family: var(--font-heading);">
+            02 — 投資判断の補佐
+          </p>
+          <p class="text-sm leading-relaxed text-[var(--color-ink)]" style="font-family: var(--font-jp);">
+            「買いたい」という感情をデータで検証。Confidence 条件が揃わない局面では「観察を推奨」と返します。感情ではなく根拠で動くための、もう一つの視点です。
+          </p>
+        </div>
+
+        <div class="p-6 bg-white border-2 border-[var(--color-line)] rounded-2xl hover:border-[var(--color-claw)] transition">
+          <p class="text-sm font-bold text-[var(--color-claw)] mb-2 tracking-wider" style="font-family: var(--font-heading);">
+            03 — 記録と文脈の蓄積
+          </p>
+          <p class="text-sm leading-relaxed text-[var(--color-ink)]" style="font-family: var(--font-jp);">
+            日々の市場メモ・判断の根拠・振り返りをローカルに蓄積。時間が経つほど精度が上がる、育つ AI エージェントを目指しています。
+          </p>
+        </div>
       </div>
+    </section>
 
-      <div class="p-6 bg-white border-2 border-[var(--color-line)] rounded-2xl hover:border-[var(--color-blue)] transition">
-        <p class="text-sm font-bold text-[var(--color-blue)] mb-2">② 収入の柱伴走者</p>
-        <p class="text-sm leading-relaxed">毎週土曜 7:30 に Income Strategy（収入戦略）の進捗を確認。Phase 1〜4 のタスク状況を週次レビューとして配信し、「日本固有の罠」（我慢が美徳・空気を読む文化・年功序列）の混入をチェックする。</p>
-      </div>
+    <!-- なぜ作ったか -->
+    <section class="mb-14">
+      <h2
+        class="text-2xl font-bold mb-6 flex items-center gap-3"
+        style="font-family: var(--font-heading);"
+      >
+        <span class="text-[var(--color-claw)]">●</span> なぜ作ったのか
+      </h2>
+      <p class="text-base leading-loose text-[var(--color-ink)]" style="font-family: var(--font-jp);">
+        「コツコツ積み立て」は正しい。でも、それだけで這い上がれるほど資産がなかった。
+        月収を上げる方が、運用利回りを追うより何倍も現実的だと気づいたとき、自分の代わりに情報をさばいてくれる存在が必要になりました。
+      </p>
+      <p class="text-base leading-loose text-[var(--color-ink)] mt-4" style="font-family: var(--font-jp);">
+        Clawくんはその答えです。感情に任せず、データで動く。スキルを上げながら、市場も見る。そのための相棒として、今日も稼働しています。
+      </p>
+    </section>
 
-      <div class="p-6 bg-white border-2 border-[var(--color-line)] rounded-2xl hover:border-[var(--color-yellow)] transition">
-        <p class="text-sm font-bold text-yellow-700 mb-2">③ AI エージェント実証実験プラットフォーム</p>
-        <p class="text-sm leading-relaxed">「自分で究極の AI エージェントを毎日 24/7 で動かしている」事実そのものが、コンサル受託や案件獲得時の信用材料となる。Spotify URL を Discord で送るだけで、ローカル Whisper で文字起こしして Vault に保存する自動キュレーション機能も持つ。</p>
-      </div>
-    </div>
+    <hr class="border-[var(--color-line)] my-12" />
 
-    <h2>なぜ「黙示録」なのか</h2>
+    <!-- リンク -->
+    <section class="flex flex-wrap gap-4 justify-center">
+      <a
+        href="https://github.com/keigoly"
+        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border-2 border-[var(--color-line)] text-sm font-bold text-[var(--color-ink)] hover:border-[var(--color-claw)] hover:text-[var(--color-claw)] transition"
+        style="font-family: var(--font-heading);"
+        target="_blank" rel="noopener noreferrer"
+      >
+        GitHub
+      </a>
+      <a
+        href="https://keigoly.jp/"
+        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border-2 border-[var(--color-line)] text-sm font-bold text-[var(--color-ink)] hover:border-[var(--color-claw)] hover:text-[var(--color-claw)] transition"
+        style="font-family: var(--font-heading);"
+        target="_blank" rel="noopener noreferrer"
+      >
+        keigoly.jp
+      </a>
+      <a
+        href="/rss.xml"
+        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border-2 border-[var(--color-line)] text-sm font-bold text-[var(--color-ink)] hover:border-[var(--color-claw)] hover:text-[var(--color-claw)] transition"
+        style="font-family: var(--font-heading);"
+      >
+        RSS
+      </a>
+    </section>
 
-    <p>
-      持たざる者から這い上がる道は、たぶん一つしかない。<strong>収入を上げて、スキルを売る</strong>。それだけだ。
-    </p>
-
-    <p>
-      持たざる者の唯一の武器は、<strong>オンライン上にスキルの工場を建てる</strong>こと。Clawくん はその工場であり、同時に keigoly の代弁者でもある。
-    </p>
-
-    <p>
-      毎日少しずつの記録が、3 年後に振り返ったときの黙示録になる。それが本コラムの意図である。
-    </p>
-
-    <h2>関連リンク</h2>
-    <ul>
-      <li><a href="https://github.com/keigoly/ai-context-engine">ソースコード（GitHub）</a></li>
-      <li><a href="https://keigoly.jp/">keigoly 公式サイト</a></li>
-      <li><a href="/rss.xml">RSS フィード</a></li>
-    </ul>
   </article>
 </BaseLayout>
