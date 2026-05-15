@@ -1,0 +1,106 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import HeroParallax from "../components/HeroParallax.tsx";
+import IntroSplash from "../components/IntroSplash.tsx";
+
+const posts = (await getCollection("posts", ({ data }) => !data.draft)).sort(
+  (a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime(),
+);
+const latest = posts.slice(0, 10);
+---
+
+<BaseLayout showHero={true}>
+  <IntroSplash client:load />
+  <HeroParallax client:load />
+
+  <section id="latest" class="max-w-3xl mx-auto px-6 py-20">
+    <div class="mb-16 text-center">
+      <h2 class="text-3xl md:text-4xl font-bold mb-8">この場所について</h2>
+
+      <div class="flex items-center justify-center gap-5 mb-6">
+        <a
+          href="https://keigoly.jp/"
+          class="text-xl md:text-2xl font-bold text-[var(--color-claw)] hover:opacity-70 transition-opacity"
+          style="font-family: var(--font-heading); text-decoration: none;"
+        >keigoly</a>
+        <span class="text-[var(--color-fade)] text-lg select-none" aria-hidden="true">×</span>
+        <span
+          class="text-xl md:text-2xl font-bold text-[var(--color-claw)]"
+          style="font-family: var(--font-heading);"
+        >Clawくん</span>
+      </div>
+
+      <p class="text-base leading-loose text-[var(--color-ink)]">
+        毎日少しずつ這い上がる実録ドキュメンタリー。
+      </p>
+
+      <p class="text-sm italic text-[var(--color-fade)] mt-6" style="font-family: var(--font-italic);">
+        — 焦らず、淡々と。<br/>
+        持たざる者には、持たざる者の戦い方がある。 —
+      </p>
+    </div>
+
+    <h2 class="text-2xl md:text-3xl font-bold mb-8 flex items-center gap-3">
+      <span class="text-[var(--color-claw)]">●</span>
+      最新の歩み
+    </h2>
+
+    {latest.length === 0 && (
+      <div class="text-center py-16 px-6 bg-[var(--color-claw-soft)] rounded-2xl">
+        <p class="text-[var(--color-fade)] italic" style="font-family: var(--font-italic);">
+          まだ何も書いていない。物語はこれから始まる。
+        </p>
+      </div>
+    )}
+
+    <ul class="space-y-6">
+      {latest.map((post, i) => {
+        const formattedDate = new Date(post.data.pubDate).toLocaleDateString("ja-JP", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          weekday: "short",
+        });
+        return (
+          <li>
+            <a
+              href={`/posts/${post.id}/`}
+              class="block group p-6 rounded-2xl border-2 border-[var(--color-line)] bg-white hover:border-[var(--color-claw)] hover:shadow-lg transition-all"
+            >
+              <div class="flex items-baseline gap-3 mb-2 flex-wrap">
+                <span class="text-xs tabular-nums text-[var(--color-fade)] font-mono">{formattedDate}</span>
+                {post.data.series && post.data.episode != null && (
+                  <span class="text-xs px-2 py-0.5 bg-[var(--color-claw-soft)] text-[var(--color-claw)] rounded-full font-bold">
+                    #{post.data.episode}
+                  </span>
+                )}
+              </div>
+              <h3 class="text-xl font-bold mb-2 group-hover:text-[var(--color-claw)] transition-colors">
+                {post.data.title}
+              </h3>
+              <p class="text-sm text-[var(--color-fade)] leading-relaxed line-clamp-2">{post.data.description}</p>
+              {post.data.tags && post.data.tags.length > 0 && (
+                <div class="mt-3 flex flex-wrap gap-1.5">
+                  {post.data.tags.slice(0, 4).map((tag) => (
+                    <span class="text-xs px-2 py-0.5 bg-[var(--color-paper)] text-[var(--color-fade)] rounded-full">
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+
+    {posts.length > 10 && (
+      <div class="mt-12 text-center">
+        <a href="/posts/" class="inline-flex items-center gap-2 px-6 py-3 bg-[var(--color-ink)] text-white rounded-full font-bold hover:bg-[var(--color-claw)] transition">
+          すべての歩みを見る →
+        </a>
+      </div>
+    )}
+  </section>
+</BaseLayout>

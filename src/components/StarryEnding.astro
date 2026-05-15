@@ -1,0 +1,31 @@
+---
+const { nextHref, nextTitle } = Astro.props;
+---
+<section class="starry-ending mt-20 py-24 px-6 rounded-3xl text-center relative">
+  <div class="relative z-10 max-w-xl mx-auto">
+    <p class="text-sm tracking-[0.2em] uppercase text-[var(--color-yellow)] mb-3">
+      ✦ 今日の歩みは ここまで ✦
+    </p>
+    <h3 class="text-2xl md:text-3xl font-bold text-white mb-6">
+      明日も<br/>歩いていきますか？
+    </h3>
+    {nextHref ? (
+      <a
+        href={nextHref}
+        class="inline-flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur border border-white/30 text-white rounded-full font-bold hover:bg-white/20 transition"
+      >
+        次の歩みへ →<br/>
+        <span class="text-sm font-normal opacity-80">{nextTitle}</span>
+      </a>
+    ) : (
+      <p class="text-white/70 italic" style="font-family: var(--font-italic);">
+        次の歩みは、明日。
+      </p>
+    )}
+    <p class="mt-8 text-white/60 text-sm">
+      <a href="/posts/" class="hover:text-[var(--color-yellow)] transition">アーカイブを見る</a>
+      <span class="mx-3">·</span>
+      <a href="/rss.xml" class="hover:text-[var(--color-yellow)] transition">RSS で購読</a>
+    </p>
+  </div>
+</section>

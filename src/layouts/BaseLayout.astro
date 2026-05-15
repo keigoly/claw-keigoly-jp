@@ -1,0 +1,70 @@
+---
+import "../styles/global.css";
+import ClawFloating from "../components/ClawFloating.tsx";
+import SmoothScroll from "../components/SmoothScroll.tsx";
+import Header from "../components/Header.tsx";
+
+const { title, description, showHero = false, image } = Astro.props;
+const siteTitle = "Clawくんと歩む";
+const siteSubtitle = "持たざる者による AI 黙示録";
+const fullTitle = title ? `${title} | ${siteTitle}` : `${siteTitle} — ${siteSubtitle}`;
+const desc =
+  description ??
+  `${siteTitle} — ${siteSubtitle}。エンジニア keigoly と AI エージェント Clawくん が毎日少しずつ這い上がる実録ドキュメンタリー。`;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const ogImageURL = new URL(image ?? "/claw-icon.jpeg", Astro.site).toString();
+---
+
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="canonical" href={canonicalURL} />
+    <link rel="alternate" type="application/rss+xml" title={siteTitle} href="/rss.xml" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={desc} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={desc} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:site_name" content={siteTitle} />
+    <meta property="og:locale" content="ja_JP" />
+    <meta property="og:image" content={ogImageURL} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={desc} />
+    <meta name="twitter:image" content={ogImageURL} />
+    <meta name="theme-color" content="#fef8f0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Shippori+Mincho+B1:wght@500;700;800&family=Noto+Serif+JP:wght@500;700;900&display=swap" rel="stylesheet" />
+    <slot name="head" />
+  </head>
+  <body class="bg-[var(--color-paper)] text-[var(--color-ink)]">
+    <SmoothScroll client:load />
+    <Header client:load />
+
+    <main class:list={[showHero ? "" : "pt-20"]}>
+      <slot />
+    </main>
+
+    <footer class="border-t border-[var(--color-line)] mt-20 bg-[var(--color-paper)]">
+      <div class="max-w-4xl mx-auto px-6 py-10 text-sm text-[var(--color-fade)] flex flex-col sm:flex-row justify-between gap-4">
+        <div>
+          <p class="font-bold text-[var(--color-ink)]">© 2026 keigoly</p>
+          <p class="mt-1">毎日少しずつ、共に歩みます。</p>
+        </div>
+        <div class="flex gap-4">
+          <a href="https://keigoly.jp/" class="hover:text-[var(--color-claw)] transition">keigoly.jp</a>
+          <a href="https://github.com/keigoly" class="hover:text-[var(--color-claw)] transition">GitHub</a>
+          <a href="/rss.xml" class="hover:text-[var(--color-claw)] transition">RSS</a>
+        </div>
+      </div>
+    </footer>
+
+    <ClawFloating client:load />
+  </body>
+</html>

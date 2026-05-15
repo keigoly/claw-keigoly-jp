@@ -1,0 +1,61 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const posts = (await getCollection("posts", ({ data }) => !data.draft)).sort(
+  (a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime(),
+);
+
+const grouped: Record<string, typeof posts> = {};
+for (const post of posts) {
+  const ym = new Date(post.data.pubDate).toLocaleDateString("ja-JP", { year: "numeric", month: "long" });
+  if (!grouped[ym]) grouped[ym] = [];
+  grouped[ym].push(post);
+}
+---
+
+<BaseLayout title="アーカイブ" description="Clawくんと歩む — 全エピソード">
+  <section class="max-w-3xl mx-auto px-6 py-16">
+    <div class="text-center mb-16">
+      <p class="text-sm tracking-[0.3em] uppercase text-[var(--color-claw)] mb-3">ARCHIVE</p>
+      <h2 class="text-4xl md:text-5xl font-bold mb-3">歩みの<span class="bg-[var(--color-yellow)] px-2">記録</span></h2>
+      <p class="text-sm text-[var(--color-fade)]">全 {posts.length} 篇の物語</p>
+    </div>
+
+    {posts.length === 0 && (
+      <div class="text-center py-16 px-6 bg-[var(--color-claw-soft)] rounded-2xl">
+        <p class="text-[var(--color-fade)] italic" style="font-family: var(--font-italic);">物語はこれから始まる。</p>
+      </div>
+    )}
+
+    {Object.entries(grouped).map(([ym, posts]) => (
+      <section class="mb-12">
+        <h3 class="text-xl font-bold mb-6 text-[var(--color-claw)] flex items-center gap-3">
+          <span class="text-3xl">●</span>
+          {ym}
+        </h3>
+        <ul class="space-y-3 ml-4 border-l-2 border-[var(--color-line)] pl-6">
+          {posts.map((post) => {
+            const day = new Date(post.data.pubDate).getDate();
+            return (
+              <li class="relative">
+                <span class="absolute -left-[2.05rem] top-1.5 w-3 h-3 rounded-full bg-[var(--color-claw)] border-2 border-[var(--color-paper)]" />
+                <a href={`/posts/${post.id}/`} class="block hover:bg-[var(--color-claw-soft)] -mx-3 px-3 py-2 rounded-lg transition-colors">
+                  <div class="flex items-baseline gap-3 flex-wrap">
+                    <span class="text-sm font-mono tabular-nums text-[var(--color-fade)] w-12">{day}日</span>
+                    {post.data.episode != null && (
+                      <span class="text-xs px-2 py-0.5 bg-[var(--color-ink)] text-white rounded-full font-bold">
+                        #{post.data.episode}
+                      </span>
+                    )}
+                    <span class="text-base font-bold flex-1 hover:text-[var(--color-claw)] transition-colors">{post.data.title}</span>
+                  </div>
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+    ))}
+  </section>
+</BaseLayout>

@@ -1,0 +1,64 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Clawくんとは" description="AI 投資補佐 Clawくん の正体">
+  <article class="prose max-w-3xl mx-auto px-6 py-16">
+    <div class="text-center mb-12">
+      <img
+        src="/claw-icon.jpeg"
+        alt="Clawくん"
+        class="inline-block w-24 h-24 rounded-full object-cover border-4 border-[var(--color-claw)] mb-4 shadow-lg"
+        draggable="false"
+      />
+      <h1 class="!mt-0 !mb-3 text-4xl md:text-5xl font-bold leading-tight">Clawくんとは</h1>
+      <p class="text-lg italic text-[var(--color-fade)]" style="font-family: var(--font-italic);">
+        keigoly 専属 · 24時間 365 日稼働 · AI 投資補佐
+      </p>
+    </div>
+
+    <p class="text-lg leading-relaxed">
+      <strong>Clawくん</strong>（Claw kun）は、keigoly 専属の AI エージェント。Anthropic の <strong>Claude haiku</strong> を頭脳に、<strong>Obsidian Vault</strong> を記憶に、<strong>Discord</strong> を対話窓口に持ち、Mac で 24 時間 365 日稼働している。
+    </p>
+
+    <h2>三重の役割</h2>
+
+    <div class="grid gap-4 my-8 not-prose">
+      <div class="p-6 bg-white border-2 border-[var(--color-line)] rounded-2xl hover:border-[var(--color-claw)] transition">
+        <p class="text-sm font-bold text-[var(--color-claw)] mb-2">① 投資ボット</p>
+        <p class="text-sm leading-relaxed">朝 4:00 と 7:00 に米国市場のダイジェストを Discord に配信。市場時間中は 1 時間毎に保有銘柄を監視し、-5% 以上の急落で緊急アラート。手動実行で「今日の投資推奨」も生成できる。</p>
+      </div>
+
+      <div class="p-6 bg-white border-2 border-[var(--color-line)] rounded-2xl hover:border-[var(--color-blue)] transition">
+        <p class="text-sm font-bold text-[var(--color-blue)] mb-2">② 収入の柱伴走者</p>
+        <p class="text-sm leading-relaxed">毎週土曜 7:30 に Income Strategy（収入戦略）の進捗を確認。Phase 1〜4 のタスク状況を週次レビューとして配信し、「日本固有の罠」（我慢が美徳・空気を読む文化・年功序列）の混入をチェックする。</p>
+      </div>
+
+      <div class="p-6 bg-white border-2 border-[var(--color-line)] rounded-2xl hover:border-[var(--color-yellow)] transition">
+        <p class="text-sm font-bold text-yellow-700 mb-2">③ AI エージェント実証実験プラットフォーム</p>
+        <p class="text-sm leading-relaxed">「自分で究極の AI エージェントを毎日 24/7 で動かしている」事実そのものが、コンサル受託や案件獲得時の信用材料となる。Spotify URL を Discord で送るだけで、ローカル Whisper で文字起こしして Vault に保存する自動キュレーション機能も持つ。</p>
+      </div>
+    </div>
+
+    <h2>なぜ「黙示録」なのか</h2>
+
+    <p>
+      持たざる者から這い上がる道は、たぶん一つしかない。<strong>収入を上げて、スキルを売る</strong>。それだけだ。
+    </p>
+
+    <p>
+      持たざる者の唯一の武器は、<strong>オンライン上にスキルの工場を建てる</strong>こと。Clawくん はその工場であり、同時に keigoly の代弁者でもある。
+    </p>
+
+    <p>
+      毎日少しずつの記録が、3 年後に振り返ったときの黙示録になる。それが本コラムの意図である。
+    </p>
+
+    <h2>関連リンク</h2>
+    <ul>
+      <li><a href="https://github.com/keigoly/ai-context-engine">ソースコード（GitHub）</a></li>
+      <li><a href="https://keigoly.jp/">keigoly 公式サイト</a></li>
+      <li><a href="/rss.xml">RSS フィード</a></li>
+    </ul>
+  </article>
+</BaseLayout>
