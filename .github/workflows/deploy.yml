@@ -3,6 +3,8 @@ name: Deploy to Cloudflare Workers
 on:
   push:
     branches: [main]
+  schedule:
+    - cron: '0 12 * * *'  # 毎日 21:00 JST (= 12:00 UTC)
 
 jobs:
   deploy:
