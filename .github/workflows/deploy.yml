@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
   schedule:
-    - cron: '0 12 * * *'  # 毎日 21:00 JST (= 12:00 UTC)
+    - cron: '30 12 * * *'  # 毎日 21:30 JST (= 12:30 UTC)
 
 jobs:
   deploy:
