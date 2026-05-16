@@ -49,7 +49,7 @@ const formattedDate = new Date(frontmatter.pubDate).toLocaleDateString("ja-JP", 
         <span class="text-sm text-[var(--color-fade)] font-mono tabular-nums">{formattedDate}</span>
         {frontmatter.series && frontmatter.episode != null && (
           <span class="text-xs px-3 py-1 bg-[var(--color-claw)] text-white rounded-full font-bold tracking-wider">
-            EPISODE #{frontmatter.episode}
+            #{frontmatter.episode}
           </span>
         )}
       </div>
