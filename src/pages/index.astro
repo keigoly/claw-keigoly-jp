@@ -8,7 +8,7 @@ const now = new Date();
 const posts = (await getCollection("posts", ({ data }) => !data.draft && new Date(data.pubDate) <= now)).sort(
   (a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime(),
 );
-const latest = posts.slice(0, 10);
+const latest = posts.slice(0, 1);
 ---
 
 <BaseLayout showHero={true}>
@@ -96,7 +96,7 @@ const latest = posts.slice(0, 10);
       })}
     </ul>
 
-    {posts.length > 10 && (
+    {posts.length > 1 && (
       <div class="mt-12 text-center">
         <a href="/posts/" class="inline-flex items-center gap-2 px-6 py-3 bg-[var(--color-ink)] text-white rounded-full font-bold hover:bg-[var(--color-claw)] transition">
           すべての歩みを見る →
