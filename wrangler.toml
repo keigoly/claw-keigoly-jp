@@ -1,5 +1,12 @@
 name = "claw-keigoly-jp"
+main = "worker/index.ts"
 compatibility_date = "2024-09-23"
 
 [assets]
 directory = "./dist"
+binding = "ASSETS"
+
+# コラム「スキ」グローバル共有カウント用 KV（worker/index.ts が読み書き）
+[[kv_namespaces]]
+binding = "LIKES"
+id = "3d5f5812189b4f15909c228a7fbb4f1c"

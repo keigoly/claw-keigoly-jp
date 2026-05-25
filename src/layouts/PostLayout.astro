@@ -71,6 +71,10 @@ const formattedDate = new Date(frontmatter.pubDate).toLocaleDateString("ja-JP", 
           ))}
         </div>
       )}
+
+      <div class="mt-6">
+        <LikeButton slug={post?.id ?? Astro.url.pathname} size="md" client:visible />
+      </div>
     </header>
 
     <slot />
@@ -79,11 +83,6 @@ const formattedDate = new Date(frontmatter.pubDate).toLocaleDateString("ja-JP", 
       — keigoly と Clawくん より
     </p>
   </article>
-
-  <!-- スキ (note 風 like ボタン・Episode 別) -->
-  <div class="max-w-3xl mx-auto px-6">
-    <LikeButton slug={post?.id ?? Astro.url.pathname} client:visible />
-  </div>
 
   <!-- 共有ボタン -->
   <div class="max-w-3xl mx-auto px-6 mt-10 mb-2">
