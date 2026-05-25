@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
 import StarryEnding from "../components/StarryEnding.astro";
+import LikeButton from "../components/LikeButton.tsx";
 import { getCollection } from "astro:content";
 
 const { frontmatter, post } = Astro.props;
@@ -78,6 +79,11 @@ const formattedDate = new Date(frontmatter.pubDate).toLocaleDateString("ja-JP", 
       — keigoly と Clawくん より
     </p>
   </article>
+
+  <!-- スキ (note 風 like ボタン・Episode 別) -->
+  <div class="max-w-3xl mx-auto px-6">
+    <LikeButton slug={post?.id ?? Astro.url.pathname} client:visible />
+  </div>
 
   <!-- 共有ボタン -->
   <div class="max-w-3xl mx-auto px-6 mt-10 mb-2">
