@@ -6,6 +6,8 @@ interface Props {
   slug: string;
   /** "md": コラムページのタイトル付近 / "sm": アーカイブ一覧の各行。 */
   size?: "sm" | "md";
+  /** true で押下不可（カウント表示専用）。アーカイブ一覧で使用。 */
+  readOnly?: boolean;
   /**
    * グローバル共有カウント API ベース。既定 "/api/likes"（Cloudflare Worker + KV）。
    * GET `${apiBase}/${slug}` で合計取得、POST/DELETE で増減。
@@ -56,6 +58,7 @@ function FloatingHearts({ trigger }: { trigger: number }) {
 export default function LikeButton({
   slug,
   size = "md",
+  readOnly = false,
   apiBase = DEFAULT_API,
 }: Props) {
   const [liked, setLiked] = useState(false);
@@ -105,6 +108,67 @@ export default function LikeButton({
     }
   }, [liked, slug, apiBase]);
 
+  const sharedStyle = {
+    gap: md ? 9 : 6,
+    padding: md ? "8px 16px 8px 13px" : "3px 10px 3px 8px",
+    border: `1.5px solid ${liked ? "var(--color-claw)" : "var(--color-line)"}`,
+    background: liked ? "var(--color-claw-soft)" : "var(--color-paper)",
+    transition: "background-color .25s, border-color .25s",
+    lineHeight: 1,
+  } as const;
+
+  const heart = (
+    <span
+      className="relative inline-flex items-center justify-center"
+      style={{ width: icon, height: icon }}
+    >
+      <motion.svg
+        viewBox="0 0 24 24"
+        width={icon}
+        height={icon}
+        aria-hidden="true"
+        animate={{ scale: !readOnly && liked ? [1, 1.35, 1] : 1 }}
+        transition={{ duration: 0.35, ease: "easeOut" }}
+        fill={liked ? "var(--color-claw)" : "none"}
+        stroke={liked ? "var(--color-claw)" : "var(--color-fade)"}
+        strokeWidth={2}
+        strokeLinejoin="round"
+      >
+        <path d={HEART_PATH} />
+      </motion.svg>
+      {!readOnly && <FloatingHearts trigger={burst} />}
+    </span>
+  );
+
+  const label = (
+    <span
+      style={{
+        fontFamily: "var(--font-heading)",
+        fontWeight: 700,
+        fontSize: md ? 15 : 13,
+        color: liked ? "var(--color-claw)" : "var(--color-fade)",
+        fontVariantNumeric: "tabular-nums",
+      }}
+    >
+      {md ? "スキ" : ""}
+      {count != null ? `${md ? " " : ""}${count}` : ""}
+    </span>
+  );
+
+  // アーカイブ等の表示専用（押下不可）
+  if (readOnly) {
+    return (
+      <div
+        className="relative inline-flex items-center rounded-full align-middle"
+        aria-label={`スキ${count != null ? ` ${count}` : ""}`}
+        style={{ ...sharedStyle, cursor: "default" }}
+      >
+        {heart}
+        {label}
+      </div>
+    );
+  }
+
   return (
     <motion.button
       type="button"
@@ -114,48 +178,10 @@ export default function LikeButton({
       whileTap={{ scale: 0.92 }}
       whileHover={{ scale: 1.04 }}
       className="relative inline-flex items-center rounded-full align-middle"
-      style={{
-        gap: md ? 9 : 6,
-        padding: md ? "8px 16px 8px 13px" : "3px 10px 3px 8px",
-        border: `1.5px solid ${liked ? "var(--color-claw)" : "var(--color-line)"}`,
-        background: liked ? "var(--color-claw-soft)" : "var(--color-paper)",
-        transition: "background-color .25s, border-color .25s",
-        cursor: "pointer",
-        lineHeight: 1,
-      }}
+      style={{ ...sharedStyle, cursor: "pointer" }}
     >
-      <span
-        className="relative inline-flex items-center justify-center"
-        style={{ width: icon, height: icon }}
-      >
-        <motion.svg
-          viewBox="0 0 24 24"
-          width={icon}
-          height={icon}
-          aria-hidden="true"
-          animate={{ scale: liked ? [1, 1.35, 1] : 1 }}
-          transition={{ duration: 0.35, ease: "easeOut" }}
-          fill={liked ? "var(--color-claw)" : "none"}
-          stroke={liked ? "var(--color-claw)" : "var(--color-fade)"}
-          strokeWidth={2}
-          strokeLinejoin="round"
-        >
-          <path d={HEART_PATH} />
-        </motion.svg>
-        <FloatingHearts trigger={burst} />
-      </span>
-      <span
-        style={{
-          fontFamily: "var(--font-heading)",
-          fontWeight: 700,
-          fontSize: md ? 15 : 13,
-          color: liked ? "var(--color-claw)" : "var(--color-fade)",
-          fontVariantNumeric: "tabular-nums",
-        }}
-      >
-        {md ? "スキ" : ""}
-        {count != null ? `${md ? " " : ""}${count}` : ""}
-      </span>
+      {heart}
+      {label}
     </motion.button>
   );
 }

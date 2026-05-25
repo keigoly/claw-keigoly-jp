@@ -53,7 +53,7 @@ for (const post of posts) {
                     <span class="text-base font-bold flex-1 hover:text-[var(--color-claw)] transition-colors">{post.data.title}</span>
                   </div>
                 </a>
-                <LikeButton slug={post.id} size="sm" client:visible />
+                <LikeButton slug={post.id} size="sm" readOnly client:visible />
               </li>
             );
           })}
