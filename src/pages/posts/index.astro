@@ -1,27 +1,78 @@
 ---
+/**
+ * アーカイブ(月別ビュー)
+ *
+ * 月タブで 1 か月だけを表示し、その月をカレンダー / リストで切り替える。
+ * 全月ぶんの HTML をビルド時に出しておき(クローラと JS 無効時のため)、
+ * 表示する月と表示形式はクライアント側で hidden を付け替えるだけ。
+ * 設計モック: docs/mock/archive-monthly.html(2026-09-16 合意)
+ */
 import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import LikeButton from "../../components/LikeButton.tsx";
 
+const JST_OFFSET_MS = 9 * 60 * 60 * 1000;
+const isoDate = (d: Date) => new Date(d.getTime() + JST_OFFSET_MS).toISOString().slice(0, 10);
+
 const now = new Date();
+const today = isoDate(now);
+const WEEKDAYS = ["日", "月", "火", "水", "木", "金", "土"];
+
 const posts = (await getCollection("posts", ({ data }) => !data.draft && new Date(data.pubDate) <= now)).sort(
-  (a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime(),
+  (a, b) => new Date(a.data.pubDate).getTime() - new Date(b.data.pubDate).getTime(),
 );
 
-const grouped: Record<string, typeof posts> = {};
+type Post = (typeof posts)[number];
+interface Month {
+  ym: string; // "2026-09"
+  year: number;
+  month: number; // 1-12
+  posts: Post[];
+  byDate: Map<string, Post>;
+  minEp: number | null;
+  maxEp: number | null;
+}
+
+const monthMap = new Map<string, Month>();
 for (const post of posts) {
-  const ym = new Date(post.data.pubDate).toLocaleDateString("ja-JP", { year: "numeric", month: "long" });
-  if (!grouped[ym]) grouped[ym] = [];
-  grouped[ym].push(post);
+  const iso = isoDate(new Date(post.data.pubDate));
+  const ym = iso.slice(0, 7);
+  let m = monthMap.get(ym);
+  if (!m) {
+    m = { ym, year: +ym.slice(0, 4), month: +ym.slice(5), posts: [], byDate: new Map(), minEp: null, maxEp: null };
+    monthMap.set(ym, m);
+  }
+  m.posts.push(post);
+  m.byDate.set(iso, post);
+  const ep = post.data.episode;
+  if (ep != null) {
+    m.minEp = m.minEp == null ? ep : Math.min(m.minEp, ep);
+    m.maxEp = m.maxEp == null ? ep : Math.max(m.maxEp, ep);
+  }
+}
+const months = [...monthMap.values()].sort((a, b) => a.ym.localeCompare(b.ym));
+const latest = months[months.length - 1]?.ym ?? "";
+
+/** その月のカレンダー用セル配列(先頭の空白 + 各日) */
+function calendarCells(m: Month) {
+  const first = new Date(Date.UTC(m.year, m.month - 1, 1));
+  const days = new Date(Date.UTC(m.year, m.month, 0)).getUTCDate();
+  const cells: { pad?: true; day?: number; iso?: string; dow?: number; post?: Post }[] = [];
+  for (let i = 0; i < first.getUTCDay(); i++) cells.push({ pad: true });
+  for (let d = 1; d <= days; d++) {
+    const iso = `${m.ym}-${String(d).padStart(2, "0")}`;
+    cells.push({ day: d, iso, dow: (first.getUTCDay() + d - 1) % 7, post: m.byDate.get(iso) });
+  }
+  return cells;
 }
 ---
 
-<BaseLayout title="アーカイブ" description="Clawくんと歩む — 全エピソード">
-  <section class="max-w-3xl mx-auto px-6 py-16">
-    <div class="text-center mb-16">
+<BaseLayout title="アーカイブ" description="Clawくんと歩む — 全エピソードを月別に">
+  <section class="archive max-w-3xl mx-auto px-4 md:px-6 py-16">
+    <div class="text-center mb-10">
       <p class="text-sm tracking-[0.3em] uppercase text-[var(--color-claw)] mb-3">ARCHIVE</p>
       <h2 class="text-4xl md:text-5xl font-bold mb-3">歩みの<span class="bg-[var(--color-yellow)] px-2">記録</span></h2>
-      <p class="text-sm text-[var(--color-fade)]">全 {posts.length} 篇の物語</p>
+      <p class="text-sm text-[var(--color-fade)]">全 {posts.length} 篇の物語 · {months.length} か月</p>
     </div>
 
     {posts.length === 0 && (
@@ -30,35 +81,355 @@ for (const post of posts) {
       </div>
     )}
 
-    {Object.entries(grouped).map(([ym, posts]) => (
-      <section class="mb-12">
-        <h3 class="text-xl font-bold mb-6 text-[var(--color-claw)] flex items-center gap-3">
-          <span class="text-3xl">●</span>
-          {ym}
-        </h3>
-        <ul class="space-y-3 ml-4 border-l-2 border-[var(--color-line)] pl-6">
-          {posts.map((post) => {
-            const day = new Date(post.data.pubDate).getDate();
-            return (
-              <li class="relative flex items-center gap-2">
-                <span class="absolute -left-[2.05rem] top-3 w-3 h-3 rounded-full bg-[var(--color-claw)] border-2 border-[var(--color-paper)]" />
-                <a href={`/posts/${post.id}/`} class="block flex-1 min-w-0 hover:bg-[var(--color-claw-soft)] -ml-3 pl-3 pr-2 py-2 rounded-lg transition-colors">
-                  <div class="flex items-baseline gap-3 flex-wrap">
-                    <span class="text-sm font-mono tabular-nums text-[var(--color-fade)] w-12">{day}日</span>
-                    {post.data.episode != null && (
-                      <span class="text-xs px-2 py-0.5 bg-[var(--color-ink)] text-white rounded-full font-bold">
-                        #{post.data.episode}
-                      </span>
+    {months.length > 0 && (
+      <>
+        {/* 月タブ */}
+        <div class="months" role="tablist" aria-label="月を選ぶ">
+          <div class="months-row">
+            {months.map((m, i) => (
+              <>
+                {(i === 0 || months[i - 1].year !== m.year) && <span class="year">{m.year}</span>}
+                <button
+                  type="button"
+                  class="mtab"
+                  role="tab"
+                  data-ym={m.ym}
+                  aria-selected={m.ym === latest ? "true" : "false"}
+                  aria-controls={`month-${m.ym}`}
+                >
+                  <b>{m.month}月</b>
+                  <small>{m.posts.length} 篇</small>
+                </button>
+              </>
+            ))}
+          </div>
+        </div>
+
+        {/* 月見出し + 表示切替 */}
+        <div class="mhead">
+          <div class="mtitle">
+            <button type="button" class="navbtn" id="month-prev" aria-label="前の月">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3 5 8l5 5" /></svg>
+            </button>
+            <div>
+              <h3 id="month-title"></h3>
+              <p class="mmeta" id="month-meta"></p>
+            </div>
+            <button type="button" class="navbtn" id="month-next" aria-label="次の月">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 3 5 5-5 5" /></svg>
+            </button>
+          </div>
+          <div class="seg" role="group" aria-label="表示形式">
+            <button type="button" id="view-cal" data-view="cal" aria-pressed="true">カレンダー</button>
+            <button type="button" id="view-list" data-view="list" aria-pressed="false">リスト</button>
+          </div>
+        </div>
+
+        {/* 各月の本体(選択中の月だけ表示) */}
+        {months.map((m) => (
+          <section
+            class="month"
+            id={`month-${m.ym}`}
+            data-ym={m.ym}
+            data-year={m.year}
+            data-month={m.month}
+            data-count={m.posts.length}
+            data-min-ep={m.minEp ?? ""}
+            data-max-ep={m.maxEp ?? ""}
+            hidden={m.ym !== latest}
+          >
+            <div class="cal" data-view="cal">
+              {WEEKDAYS.map((w, i) => (
+                <div class:list={["wd", { sun: i === 0 }]}>{w}</div>
+              ))}
+              {calendarCells(m).map((c) =>
+                c.pad ? (
+                  <div class="day pad"></div>
+                ) : (
+                  <div
+                    class:list={[
+                      "day",
+                      {
+                        sun: c.dow === 0,
+                        today: c.iso === today,
+                        has: !!c.post,
+                        future: !c.post && c.iso! > today,
+                        empty: !c.post && c.iso! <= today,
+                      },
+                    ]}
+                  >
+                    <span class="n">{c.day}</span>
+                    {c.post && (
+                      <a href={`/posts/${c.post.id}/`} title={c.post.data.title}>
+                        {c.post.data.episode != null && <span class="ep">#{c.post.data.episode}</span>}
+                        <span class="t">{c.post.data.title}</span>
+                      </a>
                     )}
-                    <span class="text-base font-bold flex-1 hover:text-[var(--color-claw)] transition-colors">{post.data.title}</span>
                   </div>
-                </a>
-                <LikeButton slug={post.id} size="sm" readOnly client:visible />
-              </li>
-            );
-          })}
-        </ul>
-      </section>
-    ))}
+                ),
+              )}
+            </div>
+
+            <ul class="list" data-view="list" hidden>
+              {[...m.posts].reverse().map((post) => {
+                const d = new Date(post.data.pubDate.getTime() + JST_OFFSET_MS);
+                return (
+                  <li>
+                    <a href={`/posts/${post.id}/`}>
+                      <span class="d">
+                        {d.getUTCDate()}
+                        <small>{WEEKDAYS[d.getUTCDay()]}曜</small>
+                      </span>
+                      {post.data.episode != null ? <span class="ep">#{post.data.episode}</span> : <span></span>}
+                      <span class="t">{post.data.title}</span>
+                      <span class="desc">{post.data.description}</span>
+                    </a>
+                    <LikeButton slug={post.id} size="sm" readOnly client:visible />
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        ))}
+
+        <div class="jump">
+          <button type="button" id="jump-prev" hidden></button>
+          <button type="button" id="jump-next" class="next" hidden></button>
+        </div>
+      </>
+    )}
   </section>
 </BaseLayout>
+
+<style>
+  /* 月タブ(固定ヘッダーの下に貼り付く) */
+  .months {
+    position: sticky;
+    top: 3.5rem;
+    z-index: 10;
+    background: color-mix(in srgb, var(--color-paper) 92%, transparent);
+    backdrop-filter: blur(8px);
+    margin: 0 -1rem 2rem;
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .months-row {
+    display: flex;
+    align-items: stretch;
+    gap: 0.4rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+  .months-row::-webkit-scrollbar { display: none; }
+  .year {
+    flex: none;
+    align-self: center;
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    color: var(--color-fade);
+    padding: 0 0.6rem 0 0.1rem;
+    border-right: 1px solid var(--color-line);
+    margin-right: 0.2rem;
+  }
+  .mtab {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 3.9rem;
+    padding: 0.35rem 0.7rem 0.3rem;
+    border-radius: 0.6rem;
+    border: 1px solid var(--color-line);
+    background: #fffdf9;
+    line-height: 1.25;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .mtab b { font-family: var(--font-heading); font-size: 1.05rem; font-weight: 800; }
+  .mtab small { font-size: 0.66rem; color: var(--color-fade); letter-spacing: 0.05em; font-variant-numeric: tabular-nums; }
+  .mtab:hover { border-color: var(--color-claw); }
+  .mtab[aria-selected="true"] { background: var(--color-claw); border-color: var(--color-claw); color: #fff; }
+  .mtab[aria-selected="true"] small { color: rgba(255, 255, 255, 0.8); }
+
+  /* 月見出し */
+  .mhead { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 0 0 1.4rem; }
+  .mtitle { display: flex; align-items: center; gap: 0.6rem; }
+  .mtitle h3 { font-size: clamp(1.5rem, 4.5vw, 2rem); font-weight: 800; margin: 0; line-height: 1.2; }
+  .mtitle h3 :global(.y) { font-family: var(--font-display); font-weight: 600; font-size: 0.6em; color: var(--color-fade); letter-spacing: 0.1em; margin-right: 0.35em; vertical-align: 0.12em; }
+  .mmeta { color: var(--color-fade); font-size: 0.82rem; font-variant-numeric: tabular-nums; margin: 0.15rem 0 0; }
+  .mmeta b { color: var(--color-ink); font-weight: 700; }
+  .navbtn {
+    width: 2.2rem; height: 2.2rem; border-radius: 50%;
+    border: 1px solid var(--color-line); background: #fffdf9;
+    display: grid; place-items: center; color: var(--color-fade); cursor: pointer; transition: 0.2s;
+  }
+  .navbtn:hover:not(:disabled) { border-color: var(--color-claw); color: var(--color-claw); }
+  .navbtn:disabled { opacity: 0.3; cursor: default; }
+  .navbtn svg { width: 14px; height: 14px; }
+  .seg { display: inline-flex; border: 1px solid var(--color-line); border-radius: 999px; padding: 3px; background: #fffdf9; }
+  .seg button { padding: 0.3rem 0.9rem; border-radius: 999px; font-size: 0.78rem; letter-spacing: 0.08em; color: var(--color-fade); cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--color-ink); color: var(--color-paper); }
+
+  /* カレンダー */
+  .cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px; }
+  .cal .wd { text-align: center; font-size: 0.68rem; letter-spacing: 0.15em; color: var(--color-fade); padding: 0.2rem 0 0.4rem; }
+  .cal .wd.sun { color: var(--color-claw); }
+  .day {
+    position: relative; min-height: 5.6rem; border-radius: 0.55rem;
+    background: #fffdf9; border: 1px solid var(--color-line);
+    padding: 0.4rem 0.5rem 0.5rem; display: flex; flex-direction: column; gap: 0.25rem;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .day.empty { background: #faf3e9; border-color: transparent; }
+  .day.pad { background: transparent; border-color: transparent; min-height: 0; }
+  .day.future { border-style: dashed; background: transparent; }
+  .day .n { font-size: 0.72rem; color: var(--color-fade); font-variant-numeric: tabular-nums; line-height: 1; }
+  .day.sun .n { color: var(--color-claw); }
+  .day.today .n { color: #fff; background: var(--color-claw); border-radius: 999px; padding: 0.15rem 0.4rem; align-self: flex-start; }
+  .day a { display: flex; flex-direction: column; gap: 0.2rem; flex: 1; min-width: 0; }
+  .day a:hover .t { color: var(--color-claw); }
+  .day.has:hover { border-color: var(--color-claw); transform: translateY(-1px); }
+  .ep {
+    display: inline-block; align-self: flex-start; font-size: 0.62rem; font-weight: 700; line-height: 1;
+    padding: 0.22rem 0.45rem; border-radius: 999px; background: var(--color-ink); color: #fff;
+  }
+  .day .t {
+    font-size: 0.76rem; font-weight: 700; line-height: 1.4; color: var(--color-ink);
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; transition: color 0.2s;
+  }
+  @media (max-width: 640px) {
+    .cal { gap: 3px; }
+    .day { min-height: 4rem; padding: 0.3rem 0.3rem 0.35rem; border-radius: 0.4rem; }
+    .day .t { display: none; }
+    .day.has::after {
+      content: ""; position: absolute; left: 50%; bottom: 0.45rem; width: 0.5rem; height: 0.5rem;
+      border-radius: 50%; background: var(--color-claw); transform: translateX(-50%);
+    }
+    .ep { font-size: 0.58rem; padding: 0.2rem 0.35rem; }
+  }
+
+  /* リスト */
+  .list { list-style: none; margin: 0; padding: 0 0 0 1.3rem; border-left: 2px solid var(--color-line); display: flex; flex-direction: column; gap: 0.2rem; }
+  .list li { position: relative; display: flex; align-items: center; gap: 0.25rem; }
+  .list li::before {
+    content: ""; position: absolute; left: calc(-1.3rem - 7px); top: 1.05rem; width: 12px; height: 12px;
+    border-radius: 50%; background: var(--color-claw); border: 2px solid var(--color-paper);
+  }
+  .list a {
+    flex: 1; min-width: 0;
+    display: grid; grid-template-columns: 3rem auto 1fr; grid-template-rows: auto auto;
+    column-gap: 0.7rem; align-items: baseline; padding: 0.6rem 0.7rem; border-radius: 0.6rem; transition: background 0.2s;
+  }
+  .list a:hover { background: var(--color-claw-soft); }
+  .list .d { font-family: var(--font-display); font-size: 0.8rem; color: var(--color-fade); font-variant-numeric: tabular-nums; grid-row: 1 / 3; align-self: start; padding-top: 0.25rem; }
+  .list .d small { font-family: var(--font-jp); font-size: 0.62rem; display: block; letter-spacing: 0.05em; line-height: 1.2; }
+  .list .t { font-weight: 700; font-size: 0.98rem; line-height: 1.5; }
+  .list a:hover .t { color: var(--color-claw); }
+  .list .desc {
+    grid-column: 2 / 4; color: var(--color-fade); font-size: 0.8rem; line-height: 1.6; margin-top: 0.1rem;
+    display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  @media (max-width: 520px) {
+    .list .desc { display: none; }
+    .list a { grid-template-columns: 2.6rem auto 1fr; }
+  }
+
+  /* 前月 / 翌月 */
+  .jump { display: flex; justify-content: space-between; gap: 1rem; margin-top: 2rem; flex-wrap: wrap; }
+  .jump button {
+    flex: 1; min-width: 12rem; padding: 0.7rem 1rem; border: 1px solid var(--color-line); border-radius: 0.7rem;
+    background: #fffdf9; font-size: 0.82rem; color: var(--color-fade); text-align: left; cursor: pointer; transition: 0.2s;
+  }
+  .jump button:hover { border-color: var(--color-claw); color: var(--color-ink); }
+  .jump :global(.lbl) { display: block; font-size: 0.64rem; letter-spacing: 0.2em; color: var(--color-claw); margin-bottom: 0.1rem; }
+  .jump .next { text-align: right; }
+  @media (prefers-reduced-motion: reduce) {
+    .archive * { transition: none !important; }
+  }
+</style>
+
+<script>
+  // 表示する月と表示形式の切り替え。HTML は全月ぶん出ているので hidden を付け替えるだけ。
+  const root = document.querySelector<HTMLElement>(".archive");
+  const sections = [...document.querySelectorAll<HTMLElement>(".month[data-ym]")];
+  const months = sections.map((s) => s.dataset.ym!);
+  const tabs = [...document.querySelectorAll<HTMLButtonElement>(".mtab[data-ym]")];
+  const $ = (id: string) => document.getElementById(id)!;
+
+  if (root && months.length > 0) {
+    let cur = months[months.length - 1];
+    let view: "cal" | "list" = "cal";
+    try {
+      const h = location.hash.slice(1);
+      if (months.includes(h)) cur = h;
+      else {
+        const s = localStorage.getItem("archive.month");
+        if (s && months.includes(s)) cur = s;
+      }
+      const v = localStorage.getItem("archive.view");
+      if (v === "list" || v === "cal") view = v;
+    } catch {}
+
+    const label = (ym: string) => `${ym.slice(0, 4)}年${+ym.slice(5)}月`;
+
+    function render() {
+      const i = months.indexOf(cur);
+      for (const s of sections) {
+        const on = s.dataset.ym === cur;
+        s.hidden = !on;
+        if (on) {
+          for (const v of s.querySelectorAll<HTMLElement>("[data-view]")) v.hidden = v.dataset.view !== view;
+          $("month-title").innerHTML = `<span class="y">${s.dataset.year}</span>${s.dataset.month}月`;
+          const eps = s.dataset.minEp ? ` · #${s.dataset.minEp} – #${s.dataset.maxEp}` : "";
+          $("month-meta").innerHTML = `<b>${s.dataset.count}</b> 篇${eps}`;
+        }
+      }
+      for (const t of tabs) t.setAttribute("aria-selected", t.dataset.ym === cur ? "true" : "false");
+      tabs[i]?.scrollIntoView({ block: "nearest", inline: "center", behavior: "smooth" });
+
+      ($("month-prev") as HTMLButtonElement).disabled = i === 0;
+      ($("month-next") as HTMLButtonElement).disabled = i === months.length - 1;
+      const jp = $("jump-prev"), jn = $("jump-next");
+      const count = (ym: string) => sections[months.indexOf(ym)].dataset.count;
+      jp.hidden = i === 0;
+      jn.hidden = i === months.length - 1;
+      if (!jp.hidden) jp.innerHTML = `<span class="lbl">← 前の月</span>${label(months[i - 1])} · ${count(months[i - 1])} 篇`;
+      if (!jn.hidden) jn.innerHTML = `<span class="lbl">次の月 →</span>${label(months[i + 1])} · ${count(months[i + 1])} 篇`;
+      $("view-cal").setAttribute("aria-pressed", String(view === "cal"));
+      $("view-list").setAttribute("aria-pressed", String(view === "list"));
+
+      try {
+        localStorage.setItem("archive.month", cur);
+        localStorage.setItem("archive.view", view);
+      } catch {}
+      if (location.hash !== `#${cur}`) history.replaceState(null, "", `#${cur}`);
+    }
+
+    const go = (ym: string | undefined) => {
+      if (ym && months.includes(ym)) {
+        cur = ym;
+        render();
+      }
+    };
+    const prev = () => go(months[months.indexOf(cur) - 1]);
+    const next = () => go(months[months.indexOf(cur) + 1]);
+
+    for (const t of tabs) t.addEventListener("click", () => go(t.dataset.ym));
+    $("month-prev").addEventListener("click", prev);
+    $("month-next").addEventListener("click", next);
+    $("jump-prev").addEventListener("click", prev);
+    $("jump-next").addEventListener("click", next);
+    $("view-cal").addEventListener("click", () => { view = "cal"; render(); });
+    $("view-list").addEventListener("click", () => { view = "list"; render(); });
+    document.addEventListener("keydown", (e) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (e.key === "ArrowLeft") prev();
+      if (e.key === "ArrowRight") next();
+    });
+    window.addEventListener("hashchange", () => go(location.hash.slice(1)));
+
+    render();
+  }
+</script>

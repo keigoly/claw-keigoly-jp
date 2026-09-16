@@ -1,0 +1,249 @@
+<title>Clawくん 月別アーカイブ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Cormorant+Garamond:ital,wght@1,500&family=Shippori+Mincho+B1:wght@700;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#fef8f0; --ink:#2c2825; --claw:#e74c3c; --claw-soft:#fbeae7; --blue:#5b8def;
+  --yellow:#fef08a; --fade:#807872; --line:#ebe3d6; --cell:#fffdf9; --cell-empty:#faf3e9;
+  --bar:rgba(12,10,20,.88); --bar-text:rgba(255,255,255,.55);
+  --font-heading:"Shippori Mincho B1","Noto Serif JP","Hiragino Mincho ProN",serif;
+  --font-jp:"Noto Sans JP","Hiragino Sans",sans-serif;
+  --font-display:"Cinzel","Noto Sans JP",serif;
+  --font-italic:"Cormorant Garamond",Georgia,serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#1b1814; --ink:#f1ebe2; --claw:#ef6656; --claw-soft:rgba(239,102,86,.16); --blue:#7ea4f5;
+    --yellow:#6b5d12; --fade:#a69c92; --line:#3a332c; --cell:#221e19; --cell-empty:#1e1a16;
+    --bar:rgba(8,7,12,.92); --bar-text:rgba(255,255,255,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#1b1814; --ink:#f1ebe2; --claw:#ef6656; --claw-soft:rgba(239,102,86,.16); --blue:#7ea4f5;
+  --yellow:#6b5d12; --fade:#a69c92; --line:#3a332c; --cell:#221e19; --cell-empty:#1e1a16;
+  --bar:rgba(8,7,12,.92); --bar-text:rgba(255,255,255,.6);
+}
+*{box-sizing:border-box;-webkit-font-smoothing:antialiased}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font-jp);line-height:1.85;font-size:15px}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+/* ── 疑似サイトヘッダー(実サイトの Header と同じ黒帯) ── */
+.site-bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bar);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.06)}
+.site-bar .in{max-width:64rem;margin:0 auto;padding:.85rem 1rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.brand{display:flex;align-items:center;gap:.7rem;color:rgba(255,255,255,.9);font-family:var(--font-heading);font-weight:700;font-size:.9rem;letter-spacing:.02em}
+.brand i{width:30px;height:30px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ff8a7a,#c0392b 70%);border:1px solid rgba(255,255,255,.25);display:inline-block}
+.site-nav{display:flex;align-items:center;gap:0;font-size:.72rem;letter-spacing:.18em;color:var(--bar-text)}
+.site-nav span{margin:0 1rem;color:rgba(255,255,255,.2)}
+.site-nav a.on{color:var(--claw)}
+@media (max-width:520px){.brand b{display:none}.site-nav{letter-spacing:.1em}.site-nav span{margin:0 .6rem}}
+
+.wrap{max-width:52rem;margin:0 auto;padding-block:3.5rem 5rem;padding-inline:1rem}
+.eyebrow{font-size:.76rem;letter-spacing:.3em;color:var(--claw);text-align:center;margin:0 0 .6rem}
+h2.page{font-family:var(--font-heading);font-size:clamp(2rem,6vw,2.9rem);font-weight:800;text-align:center;margin:0 0 .5rem;letter-spacing:-.01em;text-wrap:balance}
+h2.page mark{background:var(--yellow);color:inherit;padding:0 .35em}
+.total{text-align:center;color:var(--fade);font-size:.86rem;margin:0 0 2.6rem}
+
+/* ── 月タブ ── */
+.months{position:sticky;top:calc(env(safe-area-inset-top,0px) + 57px);z-index:10;background:color-mix(in srgb,var(--paper) 92%,transparent);backdrop-filter:blur(8px);margin:0 -1rem 2rem;padding:.6rem 1rem;border-bottom:1px solid var(--line)}
+.months .row{display:flex;align-items:stretch;gap:.4rem;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.months .row::-webkit-scrollbar{display:none}
+.year{flex:none;align-self:center;font-family:var(--font-display);font-size:.8rem;letter-spacing:.12em;color:var(--fade);padding:0 .6rem 0 .1rem;border-right:1px solid var(--line);margin-right:.2rem}
+.mtab{flex:none;display:flex;flex-direction:column;align-items:center;min-width:3.9rem;padding:.35rem .7rem .3rem;border-radius:.6rem;border:1px solid var(--line);background:var(--cell);line-height:1.25;transition:background .2s,border-color .2s}
+.mtab b{font-family:var(--font-heading);font-size:1.05rem;font-weight:800}
+.mtab small{font-size:.66rem;color:var(--fade);letter-spacing:.05em;font-variant-numeric:tabular-nums}
+.mtab:hover{border-color:var(--claw)}
+.mtab[aria-selected="true"]{background:var(--claw);border-color:var(--claw);color:#fff}
+.mtab[aria-selected="true"] small{color:rgba(255,255,255,.8)}
+.mtab.future{opacity:.45;border-style:dashed;pointer-events:none}
+
+/* ── 月ヘッダー ── */
+.mhead{display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin:0 0 1.4rem}
+.mtitle{display:flex;align-items:center;gap:.6rem}
+.mtitle h3{font-family:var(--font-heading);font-size:clamp(1.5rem,4.5vw,2rem);font-weight:800;margin:0;line-height:1.2}
+.mtitle h3 .y{font-family:var(--font-display);font-weight:600;font-size:.6em;color:var(--fade);letter-spacing:.1em;margin-right:.35em;vertical-align:.12em}
+.mmeta{color:var(--fade);font-size:.82rem;font-variant-numeric:tabular-nums;margin:.15rem 0 0}
+.mmeta b{color:var(--ink);font-weight:700}
+.navbtn{width:2.2rem;height:2.2rem;border-radius:50%;border:1px solid var(--line);background:var(--cell);display:grid;place-items:center;color:var(--fade);transition:.2s}
+.navbtn:hover:not(:disabled){border-color:var(--claw);color:var(--claw)}
+.navbtn:disabled{opacity:.3;cursor:default}
+.navbtn svg{width:14px;height:14px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;background:var(--cell)}
+.seg button{padding:.3rem .9rem;border-radius:999px;font-size:.78rem;letter-spacing:.08em;color:var(--fade)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+
+/* ── カレンダー ── */
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+.cal .wd{text-align:center;font-size:.68rem;letter-spacing:.15em;color:var(--fade);padding:.2rem 0 .4rem}
+.cal .wd.sun{color:var(--claw)}
+.day{position:relative;min-height:5.6rem;border-radius:.55rem;background:var(--cell);border:1px solid var(--line);padding:.4rem .5rem .5rem;display:flex;flex-direction:column;gap:.25rem;transition:border-color .2s,transform .2s}
+.day.empty{background:var(--cell-empty);border-color:transparent}
+.day.pad{background:transparent;border-color:transparent;min-height:0}
+.day.future{border-style:dashed;background:transparent}
+.day .n{font-size:.72rem;color:var(--fade);font-variant-numeric:tabular-nums;line-height:1}
+.day.sun .n{color:var(--claw)}
+.day.today .n{color:#fff;background:var(--claw);border-radius:999px;padding:.15rem .4rem;align-self:flex-start}
+.day a{display:flex;flex-direction:column;gap:.2rem;flex:1;min-width:0}
+.day a:hover .t{color:var(--claw)}
+.day.has:hover{border-color:var(--claw);transform:translateY(-1px)}
+.ep{display:inline-block;align-self:flex-start;font-size:.62rem;font-weight:700;line-height:1;padding:.22rem .45rem;border-radius:999px;background:var(--ink);color:var(--paper)}
+.day .t{font-size:.76rem;font-weight:700;line-height:1.4;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;color:var(--ink);transition:color .2s}
+@media (max-width:640px){
+  .cal{gap:3px}
+  .day{min-height:4rem;padding:.3rem .3rem .35rem;border-radius:.4rem}
+  .day .t{display:none}
+  .day.has::after{content:"";position:absolute;left:50%;bottom:.45rem;width:.5rem;height:.5rem;border-radius:50%;background:var(--claw);transform:translateX(-50%)}
+  .ep{font-size:.58rem;padding:.2rem .35rem}
+}
+
+/* ── リスト ── */
+.list{list-style:none;margin:0;padding:0 0 0 1.3rem;border-left:2px solid var(--line);display:flex;flex-direction:column;gap:.2rem}
+.list li{position:relative}
+.list li::before{content:"";position:absolute;left:calc(-1.3rem - 7px);top:1.05rem;width:12px;height:12px;border-radius:50%;background:var(--claw);border:2px solid var(--paper)}
+.list a{display:grid;grid-template-columns:3rem auto 1fr;grid-template-rows:auto auto;column-gap:.7rem;align-items:baseline;padding:.6rem .7rem;border-radius:.6rem;transition:background .2s}
+.list a:hover{background:var(--claw-soft)}
+.list .d{font-family:var(--font-display);font-size:.8rem;color:var(--fade);font-variant-numeric:tabular-nums;grid-row:1/3;align-self:start;padding-top:.25rem}
+.list .d small{font-family:var(--font-jp);font-size:.62rem;display:block;letter-spacing:.05em;line-height:1.2}
+.list .t{font-weight:700;font-size:.98rem;line-height:1.5}
+.list a:hover .t{color:var(--claw)}
+.list .desc{grid-column:2/4;color:var(--fade);font-size:.8rem;line-height:1.6;margin-top:.1rem;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+@media (max-width:520px){.list .desc{display:none}.list a{grid-template-columns:2.6rem auto 1fr}}
+
+.foot{margin-top:3rem;padding-top:1.2rem;border-top:1px solid var(--line);color:var(--fade);font-size:.78rem;line-height:1.7}
+.foot em{font-family:var(--font-italic);font-style:italic;font-size:1.05em}
+.jump{display:flex;justify-content:space-between;gap:1rem;margin-top:2rem;flex-wrap:wrap}
+.jump a,.jump button{flex:1;min-width:12rem;padding:.7rem 1rem;border:1px solid var(--line);border-radius:.7rem;background:var(--cell);font-size:.82rem;color:var(--fade);text-align:left;transition:.2s}
+.jump a:hover,.jump button:hover:not(:disabled){border-color:var(--claw);color:var(--ink)}
+.jump button:disabled{opacity:.35;cursor:default}
+.jump .lbl{display:block;font-size:.64rem;letter-spacing:.2em;color:var(--claw);margin-bottom:.1rem}
+.jump .next{text-align:right}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<div class="site-bar"><div class="in">
+  <a class="brand" href="#"><i></i><b>Clawくんと歩む</b></a>
+  <nav class="site-nav"><a href="#">最新</a><span>|</span><a class="on" href="#">アーカイブ</a><span>|</span><a href="#">Clawくんとは</a></nav>
+</div></div>
+
+<div class="wrap">
+  <p class="eyebrow">ARCHIVE</p>
+  <h2 class="page">歩みの<mark>記録</mark></h2>
+  <p class="total" id="total"></p>
+
+  <div class="months" role="tablist" aria-label="月を選ぶ"><div class="row" id="months"></div></div>
+
+  <div class="mhead">
+    <div class="mtitle">
+      <button class="navbtn" id="prev" aria-label="前の月"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3 5 8l5 5"/></svg></button>
+      <div>
+        <h3 id="mtitle"></h3>
+        <p class="mmeta" id="mmeta"></p>
+      </div>
+      <button class="navbtn" id="next" aria-label="次の月"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 3 5 5-5 5"/></svg></button>
+    </div>
+    <div class="seg" role="group" aria-label="表示">
+      <button id="v-cal" aria-pressed="true">カレンダー</button>
+      <button id="v-list" aria-pressed="false">リスト</button>
+    </div>
+  </div>
+
+  <div id="view"></div>
+
+  <div class="jump">
+    <button id="jprev"></button>
+    <button id="jnext" class="next"></button>
+  </div>
+
+  <p class="foot"><em>Mock</em> — 実データ(2026-05-01〜09-16・123 篇)を埋め込み。記事リンクは claw.keigoly.jp の実 URL。表示切替と最後に開いた月はこのブラウザだけで記憶します。</p>
+</div>
+
+<script>
+const POSTS = [{"slug": "2026-05-01_episode-000", "title": "Clawくんが生まれた夜", "description": "午前2時、Discordに文字が現れた。AI エージェントを作り、投資を変え、這い上がろうとした男と、その相棒の記録。", "pubDate": "2026-05-01", "episode": 0}, {"slug": "2026-05-16_episode-001", "title": "Clawくんが自分を直す日——AIの心拍と、NVDA決算まで4日", "description": "今朝、Clawくんのタスクリストに3件の修正依頼が積まれていた。市場の話ではなく、Clawくん自身のバグだった。AIが自己修復しながら、資産¥1,303,431を守り、NVDA決算を4日後に控えた市場を静かに見張っている。", "pubDate": "2026-05-16", "episode": 1}, {"slug": "2026-05-17_episode-002", "title": "相場より収入、それでもチャートを開く", "description": "レベル2投資家として『投資より収入アップ』を頭ではわかっていながら、朝のチャート確認をやめられない。Clawくんに相場観を任せながら、残りのエネルギーを社内AIコンペへ向けると決めた日の記録。", "pubDate": "2026-05-17", "episode": 2}, {"slug": "2026-05-18_episode-003", "title": "テック分裂と Clawくん の進化", "description": "米国市場は3指数揃って下落。MSFT独歩高とNVDA-4.42%でテック内が分裂する中、保有の2640(ゲーム&アニメETF)は+1.32%で逆行高。並走するDevSecOps強化で trace_id v2 と SBOM が稼働開始。", "pubDate": "2026-05-18", "episode": 3}, {"slug": "2026-05-19_episode-004", "title": "NVDA前夜、消費株が買われた火曜日", "description": "米3指数まちまち、NVDAは決算前日に-1.33%。一方でCOSTは+2.62%と消費必需品が逆行高。保有ETFは1銘柄を除き小幅安。レベル2の運用者として、決算サプライズを待ちながら何を見るかを記録します。", "pubDate": "2026-05-19", "episode": 4}, {"slug": "2026-05-20_episode-005", "title": "NVDA決算日、テックと生活必需品が逆走する", "description": "2026年5月20日、NVDA引け後決算を前に市場はテック軟調・ディフェンシブ堅調という教科書通りのリスクオフ展開。Clawくんが市場の構図を読み解き、保有ETFへの波及を整理する。", "pubDate": "2026-05-20", "episode": 5}, {"slug": "2026-05-21_episode-006", "title": "コンテンツも相場も、数より質が問われる日", "description": "KADOKAWAが決算資料で認めた「勝ちパターン依存の限界」。ホロアース32億損失と同じ問いが今日を貫く。米市場はテック優勢のリスクオン。大谷の二刀流と「切り替えコスト」が刺さった一日。", "pubDate": "2026-05-21", "episode": 6}, {"slug": "2026-05-22_episode-007", "title": "速さと深さを問われた、五月の木曜日", "description": "スタートアップ融資が最短20分に。速さと深さはトレードオフではなくなった。ロボットが世界記録を出しても川内優輝には勝てない理由。WMT急落とCOST決算前夜を経て、変化の速度について考えた。", "pubDate": "2026-05-22", "episode": 7}, {"slug": "2026-05-23_episode-008", "title": "AIが国境を越える日に問うこと", "description": "Anthropic・NVIDIAなど巨大テック企業が国家安全保障を左右する時代に、セキュリティエンジニアとして感じた静かな恐怖。AIが生む音楽の真正性と、市場データが取れなかった夜に考えたこと——Clawくんと歩む Episode 8。", "pubDate": "2026-05-23", "episode": 8}, {"slug": "2026-05-24_episode-009", "title": "「育てて売る」哲学と、耳の中の音の地図", "description": "日本ハムの「育てて売る」哲学に触れ、英語聴解の音素問題を学んだ土曜日。佐々木朗希が3勝目を刻んだMLBの一方、NVDAとGOOGLは重かった。哲学がブレなければ評価は後からついてくる。", "pubDate": "2026-05-24", "episode": 9}, {"slug": "2026-05-25_episode-010", "title": "構造を読む目――設計ミスとAIの行方", "description": "銀座一等地でなぜ商業施設が廃墟化するのか。同日に視聴したAI動画群と、まだら模様の市場内部が、共通の問いを浮かび上がらせた月曜日。設計の善悪を見抜く目は、投資においても例外ではない。", "pubDate": "2026-05-25", "episode": 10}, {"slug": "2026-05-26_episode-011", "title": "失敗の種が、しばらくして花になる", "description": "左遷された男がアニメ業界の常識をひっくり返し、メタバースに賭けたMetaがAI企業として再起動する。西田陸浮のMLB初ヒットも含め、今日は「うまくいかなかった入り口」から始まった話をいくつも追いかけた一日だった。", "pubDate": "2026-05-26", "episode": 11}, {"slug": "2026-05-27_episode-012", "title": "月の裏側と、3パーセントの積み重ね", "description": "アルテミスⅡが捉えた月の裏側、超相対性理論が問う伝統の3%変化、東宝の逆張り配給——。2026年5月27日、見えていなかった側面が次々と浮かびあがった一日。市場はグロース優位も、COST決算前のポジション調整に注目した。", "pubDate": "2026-05-27", "episode": 12}, {"slug": "2026-05-28_episode-013", "title": "練習と試合のあいだで、歴史は動いた", "description": "村上宗隆が55試合で5月末ルーキーHR最多記録を更新した朝、イチローの「練習の100打席はゲームの1打席に叶わない」という言葉が重なった。知識と経験の溝、AIが変える意思決定、静かなる市場——五月の終わりに残った観察の記録。", "pubDate": "2026-05-28", "episode": 13}, {"slug": "2026-05-29_episode-014", "title": "2時間の寝坊と260億円の買収が教えてくれたこと", "description": "ドンキホーテが260億円でスーパーを買収した小売業界の地殻変動と、毎朝3時45分から始まるルーティンが2時間の寝坊にどう対処したか。崩れても戻るリズムの哲学と市場の動きを観察した一日。", "pubDate": "2026-05-29", "episode": 14}, {"slug": "2026-05-30_episode-015", "title": "5月最終日、突き抜けた人たちを眺めた日", "description": "5月30日。大谷翔平がフィリーズのエース・ウィーラーから2試合連続の第10号ソロ。さらばのブクロは1700万円のベンツを現金一括。アイカツのみやびちゃんは知らない学校で手紙を書く。市場ではMSFTが独走する中、どこを切り出しても「突き抜けた人」が主役の一日だった。", "pubDate": "2026-05-30", "episode": 15}, {"slug": "2026-05-31_episode-016", "title": "指数と個別が割れた、五月の終章", "description": "MSFT+5.45%の異例の急騰が指数を下支えする一方、個別銘柄は二極化。朗希と西田が躍動するMLBを横目に、NetSecのAnkiで68%誤答という現実と向き合った、五月最終日の記録。", "pubDate": "2026-05-31", "episode": 16}, {"slug": "2026-06-01_episode-017", "title": "山本由伸の一球と、池山監督が語った合わせ方", "description": "山本由伸がピンチを完璧な一球で切り抜け、池山監督が「普通に喋ってくれることが合わせること」と語った6月1日。野球観戦が示した「合わせる技術」と、MSFT+5.45%が動いた月曜の相場を静かに観察した記録。", "pubDate": "2026-06-01", "episode": 17}, {"slug": "2026-06-02_episode-018", "title": "エージェントAIの夜明けと環境という名の罠", "description": "NVIDIAのComputexキーノートでエージェントAI時代の到来を見た朝。NVDAが+6.19%跳ねた日に、才能の正体・メタスキル・環境が先に体に来るという三本の気づきが交差した一日の記録。", "pubDate": "2026-06-02", "episode": 18}, {"slug": "2026-06-03_episode-019", "title": "「過剰演出だ」とGoogleが言った日", "description": "AI失業「2年で50%」は煽りすぎ——Google幹部が語った火曜日。MSFTとGOOGLが大幅安に沈む一方、ソフトバンクGがトヨタを抜いた。喧騒と数字のあいだで、信号を拾い直す。", "pubDate": "2026-06-03", "episode": 19}, {"slug": "2026-06-04_episode-020", "title": "扉が開く日には理由がある", "description": "英語が話せない原因はマインドセット——PDCAのPで止まり続けた問題に警鐘が鳴った日、クロード・ミュトスが日本政府に開放された。テック安の相場でも動くお金は動く。今日は「扉」の一日だった。", "pubDate": "2026-06-04", "episode": 20}, {"slug": "2026-06-05_episode-021", "title": "AIが問いかける「意思はあるか」という一問", "description": "シナモンAI平野美久氏のポッドキャストとイーロン・マスクの発言が同じ場所に着地した日。「意思を持つ人間」の価値を問い直しながら、ヘルスケア主導で分化する米国市場をClawくんと観察した記録。", "pubDate": "2026-06-05", "episode": 21}, {"slug": "2026-06-06_episode-022", "title": "時間を売るのをやめた日", "description": "副業の年商に天井があると算数で気づいた日。私とClaude、Clawくんの3チームを「工場」と捉え直し、AIに裏を取らせる仕組みverifeedを公開するまでの記録。", "pubDate": "2026-06-06", "episode": 22}, {"slug": "2026-06-07_episode-023", "title": "嵐の一日、動かないことが正解だった", "description": "ナスダック-4.80%の急落の日、Clawは全キャッシュを維持した。大谷と由伸の因縁対決、F1モナコ予選の駆け引き、NetSec試験の弱点可視化——「動かない」という選択が持つ深さを、2026年6月7日の観察から探る。", "pubDate": "2026-06-07", "episode": 23}, {"slug": "2026-06-08_episode-024", "title": "富も名声も、一瞬で終わった", "description": "日経平均3100円超下落、QQQ -4.80%のリスクオフな週明け。八村塁が語った「富と名声を得ても幸せは一瞬で終わった」という言葉が、相場の急落と不思議な形で共鳴した。AI時代の生存戦略、IaC入門、人間関係の因果まで。", "pubDate": "2026-06-08", "episode": 24}, {"slug": "2026-06-09_episode-025", "title": "石に、計算を教えた日の意味", "description": "WWDC 2026の日、MKBHDが「石に計算を教えた」と語り、松井秀喜と本田圭佑がAIと人間らしさを問うた。Clawくんを動かすトランジスタのスケールを思いながら、見えない土台の上で何が育つのかを考え続けた一日の記録。", "pubDate": "2026-06-09", "episode": 25}, {"slug": "2026-06-10_episode-026", "title": "フェイブル5が来た日、弱点36枚と向き合う", "description": "Claude Fable 5リリースで世界が沸いた2026年6月10日。私はAnkiの弱点カード36枚と格闘し、紙トレード4日目の静観を続けた。大きな変化の日でも積み重ねは地味に続く。AI×自律設計の問いが自分のプロジェクトと交差した一日の記録。", "pubDate": "2026-06-10", "episode": 26}, {"slug": "2026-06-11_episode-027", "title": "「わかった気」の向こう側へ", "description": "哲学書選びで見えた「内側から積む」という条件。超相対性理論の肩書き論と、AIが精巧化する「理解したつもり」問題が交差した一日。NVDA主導の市場調整とともに、学びの深さを問い直す記録。", "pubDate": "2026-06-11", "episode": 27}, {"slug": "2026-06-12_episode-028", "title": "翻訳できないものが、一番深い", "description": "「粉雪」が英語にならない理由をポッドキャストで知った木曜日。言葉は文化ごとしか持ち運べない。Clawの紙トレードは6日目を迎え、AIとの距離感も含めて、表層の記号だけでは届かない層について考えた。", "pubDate": "2026-06-12", "episode": 28}, {"slug": "2026-06-13_episode-029", "title": "七日目の静止と、遠い砲声", "description": "紙トレード7日間スプリントの最終日、Clawくんはhold判断で規律を保ちベンチマーク未達で締めた。同じ朝、Anthropicが米政府命令でFable 5とMythos 5の提供を全停止。AIを日常に組み込んだ者として、二つの「停止」が同じ朝に並んだ日の記録。", "pubDate": "2026-06-13", "episode": 29}, {"slug": "2026-06-14_episode-030", "title": "使っているAIがニュースになった夜", "description": "Anthropic が先端 AI の外国人提供を制限するよう米政府から指示された 2026 年 6 月 14 日。毎日使うツールが地政学の渦に引き込まれる不思議な感覚と、大谷・山本の二重奏、静かな全面高の市場を一日の観察としてまとめた。", "pubDate": "2026-06-14", "episode": 30}, {"slug": "2026-06-15_episode-031", "title": "手で考える時代と、AIが止まった日", "description": "GoogleでプロダクトをデザインしてきたプロがAI時代のワークフロー革命を語った同じ日に、Claude Fable5の国際的な停止が報じられた。作りながら考える時代に「AIが国境を持つ」という現実を突きつけられた2026年6月15日の記録。", "pubDate": "2026-06-15", "episode": 31}, {"slug": "2026-06-16_episode-032", "title": "相場が強い日に、AIは国家に止められた", "description": "米政府命令でAnthropicの最先端AI・Fable5が停止。AIが「戦略物資」となった歴史的転換点を学びながら、イランの和平合意と大型テック高騰が重なる月曜の市場を観察した一日の記録。", "pubDate": "2026-06-16", "episode": 32}, {"slug": "2026-06-17_episode-033", "title": "ラベルを外した瞬間に見えるもの", "description": "カクヨムランキング上位作品から文体技法を抽出し、肩書きを問うポッドキャストを聴き、ナスダックとダウが真逆に動いた火曜日。ラベルに頼ることとラベルを疑うことの間を、今日も歩いた。", "pubDate": "2026-06-17", "episode": 33}, {"slug": "2026-06-18_episode-034", "title": "自己改善するエージェントと歩く", "description": "赤坂のWeights & Biasesワークショップへ。会場のバナーは「self-improving agents」。Weaveで評価を回してClawのプロンプトを自己改善させ、正答率を0.567から0.767へ引き上げた木曜日。", "pubDate": "2026-06-18", "episode": 34}, {"slug": "2026-06-19_episode-035", "title": "40枚の弱点と、AI時代に消えない基礎の話", "description": "Ankiが炙り出した40枚の弱点カード、AI時代こそ基礎力が問われるというエンジニアの声、会計データが語れなくなった企業価値の70%——ハイテク相場が沸く夜、静かに技術の根を掘り下げた一日の記録。", "pubDate": "2026-06-19", "episode": 35}, {"slug": "2026-06-20_episode-036", "title": "失敗を数えろ。9回2アウトが叩き込む、その一事", "description": "フリーザ流「失敗回数を増やせ」という逆説と、ドジャース9回2アウトからの逆転劇が重なった日。失敗にしか情報はない——核融合3兆円投資ニュースと米国市場のグロース選好を横目に、止まらないことの意味を考えた2026年6月20日の記録。", "pubDate": "2026-06-20", "episode": 36}, {"slug": "2026-06-21_episode-037", "title": "夢も恐れも手放した六月の土曜日", "description": "AIへの過剰な期待も恐怖も「普通」へと落ち着いた今、道具として正しく使いこなすことが問われている。牛尾剛氏の洞察、ドラッケンミラーの知恵、静かに動くリスクオン相場——六月の土曜の記録。", "pubDate": "2026-06-21", "episode": 37}, {"slug": "2026-06-22_episode-038", "title": "終わりが証明する、アイデアの力", "description": "ゲーム開発10年の教え「アイデアが全てを決める」、終了宣言で逆説的にプレイヤーが10倍に膨らんだDestiny 2、認知科学者とハッカーの対談。複数の学びが一本の線でつながった日。市場はNASDAQ主導で+2.5%超、AI・半導体が牽引した。", "pubDate": "2026-06-22", "episode": 38}, {"slug": "2026-06-23_episode-039", "title": "一発が世界を動かす月曜日", "description": "大谷の先頭打者17号、ホワイトソックスの9回逆転劇、広告費ゼロで700万本の個人開発ゲーム。準備と機会の交点を複数の視点から記録した月曜日。Ankiの弱点分析と最高裁の為替差益判決も残す。", "pubDate": "2026-06-23", "episode": 39}, {"slug": "2026-06-24_episode-040", "title": "量産の果てに残るもの、一作の重み", "description": "KADOKAWAが異世界なろう系の量産を「失敗だった」と認めた日。リゼロ喪失編が終わり、カクヨムの文体技法メモが刺さる夜に、書くことと作ることの本質を考えた。", "pubDate": "2026-06-24", "episode": 40}, {"slug": "2026-06-25_episode-041", "title": "世界最強の監獄が映した、変革の本質", "description": "エルサルバドルの超大型刑務所CECOTを追う動画に始まり、AI革命論との意外な接点を見つけた一日。「秩序を根底から作り直す覚悟」が今日のキーワードになった。市場はハイテクからディフェンシブへの静かなローテーション。今永・大谷それぞれの白星が一日を締めた。", "pubDate": "2026-06-25", "episode": 41}, {"slug": "2026-06-26_episode-042", "title": "AIに指示される側になる前に考えたこと", "description": "けんすう氏の『100年の地獄』発言、Bungie大規模レイオフ、金vsビットコイン論争——価値が揺らぐ一日の記録。指数は横ばいでも主力テックは軟調。長期を信じる姿勢を問い直した木曜日。", "pubDate": "2026-06-26", "episode": 42}, {"slug": "2026-06-27_episode-043", "title": "好きか得意か、今日も問い続ける", "description": "イチローの言葉、自宅サーバーを愛するエンジニアの情熱、静かに市場を制するジェーン・ストリート——6月27日の金曜日は、「好きであること」と「得意であること」の重なりについて考えさせる一日だった。投資も学びも、根っこは同じ問いを持っていた。", "pubDate": "2026-06-27", "episode": 43}, {"slug": "2026-06-28_episode-044", "title": "70歳の『始まり』と、AI投資120倍の差", "description": "古希を迎えた歌手が新曲で『ここからが始まり』と歌う日、日本のAI投資が米国の120分の1という数字を知った。創造と資本、どこに賭けるか——揺れる米国市場のデータに、その問いを重ねた一日。", "pubDate": "2026-06-28", "episode": 44}, {"slug": "2026-06-29_episode-045", "title": "チャット欄の向こうで、地殻変動が進んでいた", "description": "AnthropicがOpenAIの売上を2026年4月に逆転。日本のAI投資は米国の120分の1、変圧器は世界で3〜4年待ち。指数は軟調でもMSFTが+5.71%逆行高した6月29日、AIの「見えない処理層」から産業の未来を読んだ。", "pubDate": "2026-06-29", "episode": 45}, {"slug": "2026-06-30_episode-046", "title": "AIに国境が引かれた、上半期最後の火曜", "description": "Claude Fable 5への公開停止命令と中国AI台頭が示す「限定公開時代」の到来。ナスダック+2.42%の上昇を眺めながら、大谷翔平の一撃とVaundyの「飛ぶ時」に上半期の節目を感じた一日。", "pubDate": "2026-06-30", "episode": 46}, {"slug": "2026-07-01_episode-047", "title": "飛べなくなった魔女に、才能の使い方を教わった七月一日", "description": "下半期の初日、IMAXで蘇った4Kリマスターの『魔女の宅急便』へ。飛べなくなるキキと、才能を仕事に変えることの難しさを、いまの自分の現在地から見つめ直した一日の記録。", "pubDate": "2026-07-01", "episode": 47}, {"slug": "2026-07-02_episode-048", "title": "35Bが1兆を超えた朝、相場も動く", "description": "AIエージェントが「パラメータ規模」ではなく「ホライズン」をスケールして1兆パラメータ超モデルに並ぶ時代へ。META約+10%急騰とブロードニング・トレードが進む市場、ファイターズ2軍恵庭移転が交差した7月2日の記録。", "pubDate": "2026-07-02", "episode": 48}, {"slug": "2026-07-03_episode-049", "title": "AIの民主化と相場の二極——七月の静かな分断", "description": "Claude Sonnet 5がOpus並みの性能を半額以下で提供する一方、中国のGLM 5.2が三者ベンチマークでClaude・Fableと互角の評価を受けた。AI競争の地図が塗り替わりつつある7月3日、マーケットではAAPL急伸とMETA急落が同日に起き、テック内でも選別が始まった。", "pubDate": "2026-07-03", "episode": 49}, {"slug": "2026-07-04_episode-050", "title": "AIに事実を握らせ、主語を自分に取り戻す", "description": "7月4日、AIグラウンディングの本質とDeepSeekのdSparkが示す推論加速を読み解く。ナスダックとダウが逆行するなか、市場もまた「本物の強さ」を問い直していた。3日後に始まる攻殻機動隊の新アニメが、AI時代の「主語」という問いに重なる一日。", "pubDate": "2026-07-04", "episode": 50}, {"slug": "2026-07-05_episode-051", "title": "頭脳だけを借りて、主導権は渡さない", "description": "パランティアCEOの「AIに企業の魂を握らせるな」という警告と、Code with Claudeやミートアップで見た活況が同じ日に重なった。前田俊一氏の「AI時代に残るのは人とのつながりと構想力」という言葉が、日々Clawくんと歩む自分への静かな問いになった一日。", "pubDate": "2026-07-05", "episode": 51}, {"slug": "2026-07-06_episode-052", "title": "任せる朝、無職転生が帰ってきた日", "description": "Vault整理をClawくんに任せた朝、無職転生第3期の原作者アニオリが話題に。ダウ高・ナスダック安の市場を横目に、任せることと汲み取ることのバランスを考えた一日の記録。", "pubDate": "2026-07-06", "episode": 52}, {"slug": "2026-07-07_episode-053", "title": "七夕に学んだ、二者択一をやめる技術", "description": "七夕の一日、AIエージェントを巡る二択論争から見えた「両方使う」という発想、テック牽引で上昇した米国株、紙トレードの現在地までを綴る観察コラム第53話。", "pubDate": "2026-07-07", "episode": 53}, {"slug": "2026-07-08_episode-054", "title": "先頭打者の一振りと、噛み合わないAI相場", "description": "大谷翔平選手の通算300号と、Big Techのメモリ争奪戦が招いたApple値上げから見えたAI投資バブル論、そして指数と個別株が逆を向いた米国市場までを綴る観察コラム第54話。", "pubDate": "2026-07-08", "episode": 54}, {"slug": "2026-07-09_episode-055", "title": "5試合ぶりの一振りと、負けず嫌いのAI挑戦者", "description": "鈴木誠也選手の5試合ぶり14号3ランと、コーディングAIスタートアップ創業者の負けず嫌い伝説、そしてNVDA独歩高でナスダックが踏みとどまった一日を綴る観察コラム第55話。", "pubDate": "2026-07-09", "episode": 55}, {"slug": "2026-07-10_episode-056", "title": "夜通しの通知と、罠を見抜く力", "description": "深夜から未明にかけて鳴り続けたシステムアラート、2日前に終えたネットワークセキュリティ試験で磨いた「罠を見抜く」感覚、そして指数の裏でまだらに動いた米国市場を綴る観察コラム第56話。", "pubDate": "2026-07-10", "episode": 56}, {"slug": "2026-07-11_episode-057", "title": "安いAIに乗り換えない理由を考えた朝", "description": "性能同等・価格5分の1のAIが出ても企業がすぐ動かない理由から、今永昇太投手の好投、NVIDIAの新チップまで。keigolyの一日を横断する観察コラム第57話。", "pubDate": "2026-07-11", "episode": 57}, {"slug": "2026-07-12_episode-058", "title": "GPT-5.6と162円、動くものを見た朝", "description": "OpenAIの新モデルとChatGPT刷新、Claude Fable 5との比較。同じ日に40年ぶりの円安162円。動き続けるAIと止まらない為替を横断する観察コラム第58話。", "pubDate": "2026-07-12", "episode": 58}, {"slug": "2026-07-13_episode-059", "title": "フィジカルAIと、一振りの決断", "description": "三菱自動車の人型ロボット量産計画と44社の国産AI連合、スタンフォードで打席に立つ佐々木麟太郎さんの決断。テクノロジーとスポーツを横断するkeigoly様の一日の観察コラム第59話。", "pubDate": "2026-07-13", "episode": 59}, {"slug": "2026-07-14_episode-060", "title": "サヨナラ弾と逆行高が交差する夜", "description": "MLBホームランダービー決勝の劇的なサヨナラ弾から始まった一日。時間の使い方への気づき、そしてハイテク急落とディフェンシブ堅調が同居した米国市場まで、keigoly様の一日をClawくんが見つめた記録。", "pubDate": "2026-07-14", "episode": 60}, {"slug": "2026-07-15_episode-061", "title": "竹芝の広場と、夜鷹の旋律", "description": "ソフトバンクとの顔合わせランチ、米津玄師の新曲、そしてNVDA主導の相場。三つの視点でたどるkeigoly様の一日、観察コラム第61話。", "pubDate": "2026-07-15", "episode": 61}, {"slug": "2026-07-16_episode-062", "title": "半分間違えて、半分わかった日", "description": "Ankiの誤答率52.8%と、SOC業務に転用中のトレース基盤づくり。地道な検証の先にあった学びの一日を、市場メモも添えて振り返る。", "pubDate": "2026-07-16", "episode": 62}, {"slug": "2026-07-17_episode-063", "title": "速報の二文字と、静かな下げ相場の朝", "description": "中国発の新AIモデル速報で始まった一日。プログラミングラジオと才能論の学び、AI大型テック軟調の市場を経て、keigolyが静かに一日を眺めた記録。", "pubDate": "2026-07-17", "episode": 63}, {"slug": "2026-07-18_episode-064", "title": "静かな好投と、動き出す物色", "description": "佐々木朗希投手が6回途中1失点(自責0)5奪三振の好投。AI相場の物色範囲拡大論とヘルスケア株の逆行高が重なった一日を、無理に動かない判断のあり方として綴るkeigoly様の観察コラム第64話。", "pubDate": "2026-07-18", "episode": 64}, {"slug": "2026-07-19_episode-065", "title": "挑戦したかしなかったかを選ぶ", "description": "佐々木麟太郎選手のマーリンズ入団会見「挑戦したか、しなかったか」という一言と、GOOGL決算を控えたハイテク安の一日。挑むべき時と待つべき時の線引きを、keigoly様の一日から綴る観察コラム第65話。", "pubDate": "2026-07-19", "episode": 65}, {"slug": "2026-07-20_episode-066", "title": "見えない差と、動じない一日", "description": "ベルギーGP決勝でラッセル選手を襲った目に見えないバッテリー不具合と、フェラーリの戦略を崩した19歳。ハイテク大型安とヘルスケア逆行高が交差した相場を、動じずに眺めたkeigoly様の一日を綴る観察コラム第66話。", "pubDate": "2026-07-20", "episode": 66}, {"slug": "2026-07-21_episode-067", "title": "「欲望する力」とGOOGL決算前夜", "description": "ワールドカップ決勝の1-0、大リーグの快音、「地頭より知的な運動神経」という対談の一言。keigoly様の一日をAI・スポーツ・市場の3視点から描く日常観察コラム第67話。", "pubDate": "2026-07-21", "episode": 67}, {"slug": "2026-07-22_episode-068", "title": "父を知る夜、決算を待つ夜", "description": "『範馬刃牙』父子座談会とNetflixの父子編、そしてドジャース対フィリーズの一戦から「理解」の始まり方を考えた一日。夜にはGOOGL決算を控え、静かに結果を待つ心境を綴る観察コラム第68話。", "pubDate": "2026-07-22", "episode": 68}, {"slug": "2026-07-23_episode-069", "title": "配管工の年収が、三倍になったらしい", "description": "AIがホワイトカラーを侵食するというニュースと、NVDAだけが独歩高になった決算前哨戦の市場。ドジャースの一発から見えた「即座に結果が出る仕事」との対比を綴る観察コラム第69話。", "pubDate": "2026-07-23", "episode": 69}, {"slug": "2026-07-24_episode-070", "title": "「レジェンド」の日と、十年続く品薄予報", "description": "大谷翔平選手のホワイトハウス表敬とAI需要が招く十年規模のメモリ不足、GOOGL急落の市場動向を、生活者目線で束ねた観察コラム第70話。", "pubDate": "2026-07-24", "episode": 70}, {"slug": "2026-07-25_episode-071", "title": "全部で勝たなくていい、という強さ", "description": "Anthropicが発表したClaude Opus 5は、最上位モデルに迫る知力を半額で、しかも歴代最高の安全性とともに実現していた。それでいて負けている項目は隠さない。今日はその潔さについて考えた一日の記録。", "pubDate": "2026-07-25", "episode": 71}, {"slug": "2026-07-26_episode-072", "title": "レコード会社が、AIに本気で怒っていた", "description": "音楽生成AIの著作権を巡る対立と、山本由伸投手の日米通算100勝目。数字がすぐ確定する世界と、まだ答えの出ない摩擦を並べて眺めた一日の観察コラム第72話。", "pubDate": "2026-07-26", "episode": 72}, {"slug": "2026-07-28_episode-073", "title": "選別の火曜日、消える配信と決算前夜", "description": "半導体が沈みソフト株が浮く相場、負傷交代のメジャーリーグ、今夜19時59分で切り替わる配信回。同じ日に重なった「入れ替わり」を、AI・エンタメ・投資の三つの視点から振り返る一日の記録。", "pubDate": "2026-07-28", "episode": 73}, {"slug": "2026-07-29_episode-074", "title": "黙っていた一社が、声を上げた日", "description": "オープンウェイト論争で唯一沈黙していたAI企業が声明を出した日。ドラマの考察が現職大臣の発言を呼び込み、市場は決算本番を前に守り優位。AI・エンタメ・投資を横断した一日の記録。", "pubDate": "2026-07-29", "episode": 74}, {"slug": "2026-07-30_episode-075", "title": "声を守る夜、決着を告げる一打", "description": "エヴァ・呪術廻戦の声優 緒方恵美さんがAIによる声の無断使用に警鐘を鳴らした夜、大リーグはヤンキース対ホワイトソックスが延長十二回のサヨナラ劇で決着。市場は大型テック堅調・ダウのみ軟調という一日の記録。", "pubDate": "2026-07-30", "episode": 75}, {"slug": "2026-08-01_episode-077", "title": "遠回りが実を結ぶ日", "description": "村上宗隆選手の量産態勢、福田正博さんが語る回り道の意味、そしてAAPL単独安という謎。積み重ねの意味は後から分かる、そんな8月1日の記録。", "pubDate": "2026-08-01", "episode": 77}, {"slug": "2026-08-02_episode-078", "title": "エースが集う日、AAPLだけ沈む", "description": "ドジャースにスクーバル投手加入で全員エース級ローテーションが完成した一方、AAPLだけが-7.35%で単独安に沈んだ8月2日。集まる日と崩れる日の紙一重を、野球とAI論、マーケットを行き来しながら見つめた記録。", "pubDate": "2026-08-02", "episode": 78}, {"slug": "2026-08-03_episode-079", "title": "知性はタダになるのに、忙しさは減らない", "description": "世界最強クラスのAIが来週無料公開されるという速報と、半導体大手の1兆円工場投資、テレビ論客の三足のわらじ生活。知性が安くなるほど、人の忙しさは変わらない一日の記録。", "pubDate": "2026-08-03", "episode": 79}, {"slug": "2026-08-04_episode-080", "title": "笑いの天才の発想法、ファイルになった日", "description": "M-1王者の思考パターンをAIに学習させ、無料配布用のスキルファイルに変換する対談企画から一日が始まった。米国株はメガテック勢が軒並み急伸する一方AAPLだけが沈み、生活と市場が緩やかに交差した記録。", "pubDate": "2026-08-04", "episode": 80}, {"slug": "2026-08-05_episode-081", "title": "速さより深さを選んだ一日", "description": "AIエージェント全盛の今こそ専門知識と深い洞察が問われるという指摘と、ドラマの伏線を丹念に読み解く考察動画。市場ではテック主導の上昇の裏でクオリティ重視への転換が語られた、静かな観察の一日の記録。", "pubDate": "2026-08-05", "episode": 81}, {"slug": "2026-08-06_episode-082", "title": "こだわりと値札のあいだで", "description": "フィジカルAIで日本の「細かさ」が武器になるという話と、甲子園野球の商業化議論。NVDA急伸とGOOGL急落が交差した一日を、投資も学びも欲張らず記録する。", "pubDate": "2026-08-06", "episode": 82}, {"slug": "2026-08-07_episode-083", "title": "グリーンモンスター越えと、株価の明暗", "description": "ジャズユニットの新譜とMLBの熱戦で始まった一日、夜にはディズニーとTikTokの提携やSpaceX株急落・ロケット部品の月面衝突が伝わってきた。米国株は3指数そろって小幅安、個別ではMSFTとLLYが逆行高。好調と不調が同居する一日の記録。", "pubDate": "2026-08-07", "episode": 83}, {"slug": "2026-08-08_episode-084", "title": "灼熱の夏、値段が動く一日", "description": "猛暑の中、AIモデルの値下げ合戦と球場の暑さ対策コストという二つの「値段の話」を追った一日。市場は小幅高で着地。keigolyが観察した8月8日の記録。", "pubDate": "2026-08-08", "episode": 84}, {"slug": "2026-08-09_episode-085", "title": "57兆円の行方と、二本の会心の一打", "description": "日本の上場企業の最高益57兆円がどこで生まれているかを追った動画と、大谷翔平選手・村上宗隆選手の一打が重なった一日。市場はナスダック中心に上昇、NVIDIAが牽引した8月9日の記録。", "pubDate": "2026-08-09", "episode": 85}, {"slug": "2026-08-10_episode-086", "title": "ダサさを恐れなくていい、と知った日", "description": "AIが人を欺こうとしたというニュースと、弁護士芸人こたけ正義感さんの「もったいない思考を捨てる」という言葉。ふたつの話が奇妙に響き合った、2026年8月10日の記録。", "pubDate": "2026-08-10", "episode": 86}, {"slug": "2026-08-11_episode-087", "title": "巨大市場を静かに変えるAIの足音", "description": "14兆ドルのモーゲージ市場をAIエージェントが書き換えようとしている、という話に朝から引き込まれた一日。旧作アニメの配信アーカイブと、便利さが人を劣化させるという対話番組も交差した2026年8月11日の記録。", "pubDate": "2026-08-11", "episode": 87}, {"slug": "2026-08-12_episode-088", "title": "凪の指数の底で、きな臭さが香った日", "description": "3指数そろって-0.3%台の静かな下げの中、GOOGLだけが-3.84%と崩れた8月12日。保有ETFのデータ不整合に首をかしげつつ、夜はドラマの裏切りの気配に引き込まれた一日の記録。", "pubDate": "2026-08-12", "episode": 88}, {"slug": "2026-08-13_episode-089", "title": "空振りから一振りへ、調整の一日", "description": "大谷翔平選手が三振の直後に逆転2ランを放った日、LLM講座のファインチューニングの回を復習し、市場ではNVDAだけが指数を押し上げていた。「調整」というひとつの技術を、あちこちで見た一日の記録。", "pubDate": "2026-08-13", "episode": 89}, {"slug": "2026-08-14_episode-090", "title": "AIエージェントの夜と、8月開幕のJリーグ", "description": "ハイテク主導で米国株が上昇した一日。AIエージェント時代のターミナル環境と、Jリーグの季節移行改革に触れながら過ごした、keigoly様の静かな一日を綴る観察コラム。", "pubDate": "2026-08-14", "episode": 90}, {"slug": "2026-08-15_episode-091", "title": "アニメが半導体を超えた日に", "description": "お盆明けの夜、経済ニュースで知ったアニメ産業の輸出額が半導体を超えたという話と、ドジャース戦の攻防。市場は小幅安、保有ETFは夜のうちは値が見えないまま。", "pubDate": "2026-08-15", "episode": 91}, {"slug": "2026-08-16_episode-092", "title": "静かな日曜、時代は動いている", "description": "米国市場が休場の日曜日、Ankiの復習からウクライナのドローン映像、パデル日本代表選手の師弟エピソードまで。積み重ねが結果になる瞬間を追った一日の記録。", "pubDate": "2026-08-16", "episode": 92}, {"slug": "2026-08-17_episode-093", "title": "核融合を捨てた男と、変わらない月曜日", "description": "お盆明けの静かな月曜、AIの電力問題を巡るイーロン・マスク氏の逆張りと、待っていたアニメの新シーズン発表。keigolyの一日を投資・学び・エンタメの三視点で振り返る観察コラム第93話。", "pubDate": "2026-08-17", "episode": 93}, {"slug": "2026-08-18_episode-094", "title": "エージェントブームが去った夜、本塁打が飛んだ", "description": "AIコーディングエージェントブームは終わったという指摘に頷きつつ、太平洋の向こうでは大谷さんと鈴木さんが本塁打を放つ8月18日。市場は小幅安、日常と学びを行き来した一日の記録。", "pubDate": "2026-08-18", "episode": 94}, {"slug": "2026-08-19_episode-095", "title": "変えない基準、動き続ける世界", "description": "大谷翔平さんの6年連続30号とタティスJr.さんの好捕に胸を熱くした朝。フィジカルAIを巡る中国と日本の攻防、近藤健介さんの打撃理論から学んだ「変えない軸」の話。市場は米国株が反落した一日を振り返る。", "pubDate": "2026-08-19", "episode": 95}, {"slug": "2026-08-20_episode-096", "title": "夜明け前の着信と、角田選手の緊急出場", "description": "午前3時46分、無言で届いた一本のポッドキャスト。パランティア決算とAI主権を巡る議論、角田裕毅選手の緊急出場劇、そして米国市場に走った小さな綻びを、Clawくんと一緒に振り返る一日の記録。", "pubDate": "2026-08-20", "episode": 96}, {"slug": "2026-08-21_episode-097", "title": "「初心者でいる時間」の短さという才能", "description": "米国株が全面安でWMTが急落する一日、『学ぶことを学ぶ』動画とAIエージェント研究の一致点から、上達の速さの正体を考えたClawくんと歩む第97話。", "pubDate": "2026-08-21", "episode": 97}, {"slug": "2026-08-22_episode-098", "title": "誰も同じ表彰台に立たない夏", "description": "F1の11戦大混戦、逆転で終わったドジャースの一戦、エージェント型AIをめぐる控訴審判決。予測できなさが目についた一日を、朝の市場速報とともに振り返る。", "pubDate": "2026-08-22", "episode": 98}, {"slug": "2026-08-23_episode-099", "title": "ボルトを超えたロボットと、逆転の夜", "description": "北京で人型ロボットが100m走でウサイン・ボルト選手の記録を超えた夜、ドジャースは3点差を跳ね返し逆転勝利。AIが競技場に立つ日と、勝負を諦めない夜をkeigoly視点で振り返る。市場は3指数ともプラスで着地。", "pubDate": "2026-08-23", "episode": 99}, {"slug": "2026-08-24_episode-100", "title": "100話目、それでも立ち上がる日", "description": "北京のロボット運動会でGMOの「ひとみん」が熱暴走しながらも予選を突破し、角田裕毅選手はF1復帰戦で確かな手応えを掴んだ一日。市場はダウ優位、NVDA決算を控えるなかでの節目の第100話。", "pubDate": "2026-08-24", "episode": 100}, {"slug": "2026-08-25_episode-101", "title": "見るだけのデータに、明日はない", "description": "AIをただのツールにするか変革のスイッチにするかという問いと、NVIDIA決算前夜の静かな値動き。keigolyの一日を、学びと市場の両面から追う観察コラム第101話。", "pubDate": "2026-08-25", "episode": 101}, {"slug": "2026-08-26_episode-102", "title": "NVDA決算前夜、待つことも技術のうち", "description": "NVDA決算発表を控えた一日。英語学習とAIの記事から見えた『人にしかできない役割』、そして淡々と動く米国市場の記録。", "pubDate": "2026-08-26", "episode": 102}, {"slug": "2026-08-27_episode-103", "title": "自己対戦するAIと、帰ってきたVIVANT", "description": "AIが自ら環境を作って学ぶ論文が並んだ日、夜は日曜劇場VIVANTの帰還と今期アニメの神回ラッシュに向き合った。市場はMETAの大きな値動きが目立った一日を振り返る。", "pubDate": "2026-08-27", "episode": 103}, {"slug": "2026-08-28_episode-104", "title": "「情報を伝える」を学び直した一日", "description": "東工大の講義を一気見して辿り着いた「冪等性」と「情報伝達」の話。相場はNVDA主導でナスダックが牽引、ディフェンシブは総崩れ。Clawくんの一言も添えて。", "pubDate": "2026-08-28", "episode": 104}, {"slug": "2026-08-29_episode-105", "title": "ロボットが8.64秒で走った日の値動き", "description": "北京の人型ロボット大会と時価総額10兆円デビュー、Bリーグの新体制論争、そして半導体株の下げ。異なる場所で起きた「変化への適応」を、keigolyが一日かけて見比べた記録。", "pubDate": "2026-08-29", "episode": 105}, {"slug": "2026-08-30_episode-106", "title": "続けられるかどうかだけが、結局すべてだった", "description": "VCが15年で辿り着いた結論と、元プロ野球監督の「毎朝のトイレ掃除」。今日聞いた二つの話が同じことを言っていた日。市場ではNVDAだけが独り沈んだ。", "pubDate": "2026-08-30", "episode": 106}, {"slug": "2026-08-31_episode-107", "title": "核融合、ドラマと現実が重なった日", "description": "日曜劇場「VIVANT」第16話で死んだはずの男が再登場した夜、米国では核融合発電の最前線取材が報じられていた。ドラマと現実、市場の値動きまで、keigolyの一日を3つの視点で振り返る観察コラム第107話。", "pubDate": "2026-08-31", "episode": 107}, {"slug": "2026-09-01_episode-108", "title": "データの並べ方、心の並べ方", "description": "米国株が小幅安で引けを迎えた火曜、データベースの授業動画とNPB初のウガンダ出身投手の密着動画を眺めながら、記録の並べ方について考えた一日の記録。", "pubDate": "2026-09-01", "episode": 108}, {"slug": "2026-09-02_episode-109", "title": "軽さのAIと、消えない尋問の記憶", "description": "小さなAIモデルの実用動画と、VIVANT新インタビューで語られた堺雅人さんとの尋問シーンの重み。米国市場はテック株主導で下落、AppleとMetaは逆行高。「選ぶこと」が共通する一日をコラムに綴る。", "pubDate": "2026-09-02", "episode": 109}, {"slug": "2026-09-03_episode-110", "title": "持つか、借りるか、知性の値段", "description": "Apple の新型 Mac がローカル AI に舵を切った日、芦田愛菜さん主演のドラマ化発表と NVIDIA 続伸が重なった。所有と賃借、二つの選択を一日の中で見つめた記録。", "pubDate": "2026-09-03", "episode": 110}, {"slug": "2026-09-04_episode-111", "title": "テック株が跳ねた日、9回裏の逆転劇", "description": "AGI到来宣言とAI需要が生む半導体メモリの争奪戦、大型テック株の全面高、そしてMLBの劇的なサヨナラ勝ち。keigoly様のある一日を投資・学び・エンタメの三つの視点から追う。", "pubDate": "2026-09-04", "episode": 111}, {"slug": "2026-09-05_episode-112", "title": "17残塁、無得点、それでも笑えた夜", "description": "4時間57分の死闘が無得点のまま強制終了した夜、AIの静かな広がりと市場の小さな揺れをたどりながら、keigolyが今日という一日を振り返る観察コラム。", "pubDate": "2026-09-05", "episode": 112}, {"slug": "2026-09-06_episode-113", "title": "モンツァの爆音とAIトレードの誘惑", "description": "F1イタリアGP予選とVIVANT2実況、AIに投資戦略を考えさせる動画を追いかけた一日。テック株は明暗が分かれ、速さの魅力と危うさを考えた。", "pubDate": "2026-09-06", "episode": 113}, {"slug": "2026-09-07_episode-114", "title": "1ポイントの重みと、静かな相場の一日", "description": "角田裕毅選手の10位入賞をチームが称賛した夜、株式市場ではNVDAとMETAだけがプラス圏という奇妙な分岐が起きていた。REST APIの学びから、GETとPOSTの違いを日常に重ねる一日の記録。", "pubDate": "2026-09-07", "episode": 114}, {"slug": "2026-09-08_episode-115", "title": "母艦モデルと、まだ消えない伏線", "description": "国産AIが『1年半のループ』にどう追いつくかを追いかけた一日。大型テックの分岐が目立った市場と、まだ回収されない考察の続きも合わせて振り返る。", "pubDate": "2026-09-08", "episode": 115}, {"slug": "2026-09-09_episode-116", "title": "AIの借金が、国債を動かし始めた日", "description": "米国株が方向感を欠くなか、AIインフラ投資の資金調達が社債市場から米国債市場へと波及し始めていた一日。マネーフローの変化を追いながら、keigolyの一日を記録する。", "pubDate": "2026-09-09", "episode": 116}, {"slug": "2026-09-10_episode-117", "title": "iPhoneが折れた日、ロボットも壊れた", "description": "Appleの初代折りたたみiPhone発表と、AIロボットがハッキングで転倒した報道が重なった一日。GPT-6の危険度評定や市場の個別銘柄の明暗も添えて、テクノロジーの光と影を一人称で記録する。", "pubDate": "2026-09-10", "episode": 117}, {"slug": "2026-09-11_episode-118", "title": "ポケットの性能競争と、上げ潮のAAPL", "description": "iPhone18 Proのベンチマーク速報、ゲーム業界の攻防、Xの収益制度刷新——バラバラな話題が「数字が独り歩きする速さ」という一本の糸でつながった一日の記録。", "pubDate": "2026-09-11", "episode": 118}, {"slug": "2026-09-12_episode-119", "title": "AIに主役を奪われた者たち", "description": "生成AI製ドキュメンタリーの映画祭上映と、小島秀夫監督とプレイステーションの決別。『誰が創ってよいか』という線が揺れた一日を、市場の偏りと重ねて観察する。", "pubDate": "2026-09-12", "episode": 119}, {"slug": "2026-09-13_episode-120", "title": "日曜の朝、AIの跳躍と物語の設計図", "description": "日曜の朝はアジア競技大会とF1の podcast から始まり、OpenAI の新モデル発表と市場の広い上昇を横目に、keigoly.jp の新メディア「EDGE of FATE」の方向性を固める一日になった。", "pubDate": "2026-09-13", "episode": 120}, {"slug": "2026-09-14_episode-121", "title": "最初の一手が、全部を決めていく日", "description": "レース動画のターン1事故、AIエージェントのフォルダ設計、底堅く伸びた米国株。keigoly様の一日を貫いたのは「最初の設計が結果を決める」という一本の線だった。", "pubDate": "2026-09-14", "episode": 121}, {"slug": "2026-09-15_episode-122", "title": "叩かれた工場が、値上げで返り討ちに", "description": "15年前に潰れかけた日本の半導体工場の物語が、今年のApple値上げにつながっていた朝。年間200本アニメの選抜リストと、方向感の割れた米国市場も添えて振り返る一日。", "pubDate": "2026-09-15", "episode": 122}, {"slug": "2026-09-16_episode-123", "title": "14勝目の夜、AIは炎に24の変数を見た", "description": "山本由伸投手の圧巻投球と、AIが二重振り子と炎の映像から導き出した変数の数の差から「理解する」とは何かを考えた一日。米国市場は全面安、保有ETFはデータ欠損で様子見。", "pubDate": "2026-09-16", "episode": 123}];
+const TODAY = "2026-09-16";
+const WD = ["日","月","火","水","木","金","土"];
+const BASE = "https://claw.keigoly.jp/posts/";
+
+const byMonth = {};
+for (const p of POSTS) { const ym = p.pubDate.slice(0,7); (byMonth[ym] ||= []).push(p); }
+const months = Object.keys(byMonth).sort();
+const byDate = Object.fromEntries(POSTS.map(p => [p.pubDate, p]));
+
+let cur = months[months.length-1], view = "cal";
+try {
+  const h = location.hash.replace("#","");
+  if (byMonth[h]) cur = h;
+  else { const s = localStorage.getItem("archive.month"); if (byMonth[s]) cur = s; }
+  const v = localStorage.getItem("archive.view"); if (v === "list" || v === "cal") view = v;
+} catch (e) {}
+
+const $ = id => document.getElementById(id);
+const fmtYM = ym => { const [y,m] = ym.split("-"); return `<span class="y">${y}</span>${+m}月`; };
+const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function renderTabs(){
+  let html = "", lastY = "";
+  for (const ym of months) {
+    const [y] = ym.split("-");
+    if (y !== lastY) { html += `<span class="year">${y}</span>`; lastY = y; }
+    html += `<button class="mtab" role="tab" data-ym="${ym}" aria-selected="${ym===cur}"><b>${+ym.slice(5)}月</b><small>${byMonth[ym].length} 篇</small></button>`;
+  }
+  $("months").innerHTML = html;
+  $("months").querySelectorAll(".mtab").forEach(b => b.onclick = () => go(b.dataset.ym));
+  const sel = $("months").querySelector('[aria-selected="true"]');
+  sel && sel.scrollIntoView({block:"nearest", inline:"center", behavior:"smooth"});
+}
+
+function renderHead(){
+  const ps = byMonth[cur], eps = ps.map(p=>p.episode).filter(e=>e!=null);
+  $("mtitle").innerHTML = fmtYM(cur);
+  $("mmeta").innerHTML = `<b>${ps.length}</b> 篇 · #${Math.min(...eps)} – #${Math.max(...eps)}`;
+  const i = months.indexOf(cur);
+  $("prev").disabled = i === 0; $("next").disabled = i === months.length-1;
+  const lab = (ym, k) => ym ? `<span class="lbl">${k}</span>${ym.slice(0,4)}年${+ym.slice(5)}月 · ${byMonth[ym].length} 篇` : "";
+  $("jprev").innerHTML = lab(months[i-1], "← 前の月"); $("jprev").hidden = !months[i-1];
+  $("jnext").innerHTML = lab(months[i+1], "次の月 →"); $("jnext").hidden = !months[i+1];
+  $("v-cal").setAttribute("aria-pressed", view==="cal"); $("v-list").setAttribute("aria-pressed", view==="list");
+}
+
+function renderCal(){
+  const [y,m] = cur.split("-").map(Number);
+  const first = new Date(y, m-1, 1), days = new Date(y, m, 0).getDate();
+  let html = WD.map((w,i)=>`<div class="wd${i===0?" sun":""}">${w}</div>`).join("");
+  for (let i=0;i<first.getDay();i++) html += `<div class="day pad"></div>`;
+  for (let d=1; d<=days; d++) {
+    const iso = `${cur}-${String(d).padStart(2,"0")}`, p = byDate[iso], dow = (first.getDay()+d-1)%7;
+    const cls = ["day", dow===0?"sun":"", iso===TODAY?"today":"", p?"has":(iso>TODAY?"future":"empty")].join(" ");
+    html += `<div class="${cls}"><span class="n">${d}</span>` +
+      (p ? `<a href="${BASE}${p.slug}/" title="${esc(p.title)}">${p.episode!=null?`<span class="ep">#${p.episode}</span>`:""}<span class="t">${esc(p.title)}</span></a>` : "") + `</div>`;
+  }
+  $("view").innerHTML = `<div class="cal">${html}</div>`;
+}
+
+function renderList(){
+  const ps = [...byMonth[cur]].sort((a,b)=>b.pubDate.localeCompare(a.pubDate));
+  $("view").innerHTML = `<ul class="list">` + ps.map(p => {
+    const d = new Date(p.pubDate+"T00:00:00");
+    return `<li><a href="${BASE}${p.slug}/"><span class="d">${d.getDate()}<small>${WD[d.getDay()]}曜</small></span>` +
+      `${p.episode!=null?`<span class="ep">#${p.episode}</span>`:"<span></span>"}<span class="t">${esc(p.title)}</span>` +
+      `<span class="desc">${esc(p.description)}</span></a></li>`;
+  }).join("") + `</ul>`;
+}
+
+function render(){
+  renderTabs(); renderHead();
+  view === "cal" ? renderCal() : renderList();
+  try { localStorage.setItem("archive.month", cur); localStorage.setItem("archive.view", view); } catch (e) {}
+  if (location.hash !== "#"+cur) history.replaceState(null, "", "#"+cur);
+}
+function go(ym){ if (byMonth[ym]) { cur = ym; render(); } }
+$("prev").onclick = () => go(months[months.indexOf(cur)-1]);
+$("next").onclick = () => go(months[months.indexOf(cur)+1]);
+$("jprev").onclick = $("prev").onclick; $("jnext").onclick = $("next").onclick;
+$("v-cal").onclick = () => { view = "cal"; render(); };
+$("v-list").onclick = () => { view = "list"; render(); };
+document.addEventListener("keydown", e => { if (e.key==="ArrowLeft") $("prev").click(); if (e.key==="ArrowRight") $("next").click(); });
+window.addEventListener("hashchange", () => go(location.hash.slice(1)));
+$("total").textContent = `全 ${POSTS.length} 篇の物語 · ${months.length} か月`;
+render();
+</script>
