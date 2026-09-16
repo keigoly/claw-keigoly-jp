@@ -201,6 +201,24 @@ function calendarCells(m: Month) {
   </section>
 </BaseLayout>
 
+<style is:global>
+  /* アーカイブだけ暖色ダーク(2026-09-16 keigoly様の指定。拡張機能の反転で見えた配色を正式採用)。
+     global.css の @theme(:root)より特異度を上げて上書きする。ヘッダーは元から黒。 */
+  html:root {
+    --color-paper: #2a1e10;
+    --color-ink: #f3ece1;
+    --color-fade: #a99d8c;
+    --color-line: #4a3a27;
+    --color-claw-soft: rgba(231, 76, 60, 0.16);
+    --color-yellow: #5f5316;
+    --cell: #33261a;
+    --cell-empty: #2e2214;
+    --badge: #3b3644;
+    --badge-text: #fff;
+  }
+  html { background: var(--color-paper); }
+</style>
+
 <style>
   /* 月タブ(固定ヘッダーの下に貼り付く) */
   .months {
@@ -242,7 +260,7 @@ function calendarCells(m: Month) {
     padding: 0.35rem 0.7rem 0.3rem;
     border-radius: 0.6rem;
     border: 1px solid var(--color-line);
-    background: #fffdf9;
+    background: var(--cell);
     line-height: 1.25;
     cursor: pointer;
     transition: background 0.2s, border-color 0.2s;
@@ -262,13 +280,13 @@ function calendarCells(m: Month) {
   .mmeta b { color: var(--color-ink); font-weight: 700; }
   .navbtn {
     width: 2.2rem; height: 2.2rem; border-radius: 50%;
-    border: 1px solid var(--color-line); background: #fffdf9;
+    border: 1px solid var(--color-line); background: var(--cell);
     display: grid; place-items: center; color: var(--color-fade); cursor: pointer; transition: 0.2s;
   }
   .navbtn:hover:not(:disabled) { border-color: var(--color-claw); color: var(--color-claw); }
   .navbtn:disabled { opacity: 0.3; cursor: default; }
   .navbtn svg { width: 14px; height: 14px; }
-  .seg { display: inline-flex; border: 1px solid var(--color-line); border-radius: 999px; padding: 3px; background: #fffdf9; }
+  .seg { display: inline-flex; border: 1px solid var(--color-line); border-radius: 999px; padding: 3px; background: var(--cell); }
   .seg button { padding: 0.3rem 0.9rem; border-radius: 999px; font-size: 0.78rem; letter-spacing: 0.08em; color: var(--color-fade); cursor: pointer; }
   .seg button[aria-pressed="true"] { background: var(--color-ink); color: var(--color-paper); }
 
@@ -278,11 +296,11 @@ function calendarCells(m: Month) {
   .cal .wd.sun { color: var(--color-claw); }
   .day {
     position: relative; min-height: 5.6rem; border-radius: 0.55rem;
-    background: #fffdf9; border: 1px solid var(--color-line);
+    background: var(--cell); border: 1px solid var(--color-line);
     padding: 0.4rem 0.5rem 0.5rem; display: flex; flex-direction: column; gap: 0.25rem;
     transition: border-color 0.2s, transform 0.2s;
   }
-  .day.empty { background: #faf3e9; border-color: transparent; }
+  .day.empty { background: var(--cell-empty); border-color: transparent; }
   .day.pad { background: transparent; border-color: transparent; min-height: 0; }
   .day.future { border-style: dashed; background: transparent; }
   .day .n { font-size: 0.72rem; color: var(--color-fade); font-variant-numeric: tabular-nums; line-height: 1; }
@@ -293,7 +311,7 @@ function calendarCells(m: Month) {
   .day.has:hover { border-color: var(--color-claw); transform: translateY(-1px); }
   .ep {
     display: inline-block; align-self: flex-start; font-size: 0.62rem; font-weight: 700; line-height: 1;
-    padding: 0.22rem 0.45rem; border-radius: 999px; background: var(--color-ink); color: #fff;
+    padding: 0.22rem 0.45rem; border-radius: 999px; background: var(--badge); color: var(--badge-text);
   }
   .day .t {
     font-size: 0.76rem; font-weight: 700; line-height: 1.4; color: var(--color-ink);
@@ -340,7 +358,7 @@ function calendarCells(m: Month) {
   .jump { display: flex; justify-content: space-between; gap: 1rem; margin-top: 2rem; flex-wrap: wrap; }
   .jump button {
     flex: 1; min-width: 12rem; padding: 0.7rem 1rem; border: 1px solid var(--color-line); border-radius: 0.7rem;
-    background: #fffdf9; font-size: 0.82rem; color: var(--color-fade); text-align: left; cursor: pointer; transition: 0.2s;
+    background: var(--cell); font-size: 0.82rem; color: var(--color-fade); text-align: left; cursor: pointer; transition: 0.2s;
   }
   .jump button:hover { border-color: var(--color-claw); color: var(--color-ink); }
   .jump :global(.lbl) { display: block; font-size: 0.64rem; letter-spacing: 0.2em; color: var(--color-claw); margin-bottom: 0.1rem; }
