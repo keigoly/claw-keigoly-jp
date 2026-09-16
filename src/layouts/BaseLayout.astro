@@ -43,6 +43,8 @@ const ogImageURL = new URL(image ?? "/claw-icon.jpeg", Astro.site).toString();
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Shippori+Mincho+B1:wght@500;700;800&family=Noto+Serif+JP:wght@500;700;900&display=swap" rel="stylesheet" />
     <slot name="head" />
+    <!-- Cloudflare Web Analytics (ブラウザ実測。keigoly.jp ゾーン共通のトークン。レポートはホスト別に集計) -->
+    <script is:inline defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "a62f6c025c3d4dd6a0db7db4e198fa1e"}'></script>
   </head>
   <body class="bg-[var(--color-paper)] text-[var(--color-ink)]">
     <SmoothScroll client:load />
