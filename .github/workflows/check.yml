@@ -1,13 +1,17 @@
-name: Deploy to Cloudflare Workers
+name: Check posts and build
 
+# 記事の検査(scripts/check-posts.mjs)とビルドを、PR と main への push で走らせる。
+# 壊れた記事が 1 本でもあれば、全件のファイル名と行番号を出して止まる。デプロイはしない。
 on:
+  pull_request:
   push:
     branches: [main]
-  schedule:
-    - cron: '30 12 * * *'  # 毎日 21:30 JST (= 12:30 UTC)
+
+permissions:
+  contents: read
 
 jobs:
-  deploy:
+  check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,6 +23,3 @@ jobs:
       - run: npm ci
       - run: npm run check:posts
       - run: npm run build
-      - run: npx wrangler deploy
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
